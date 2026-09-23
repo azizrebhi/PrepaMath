@@ -1,5 +1,5 @@
 """
-Ingests an already-processed Markdown file (Docling output) into the
+Ingests an already-processed Markdown file (LlamaParse output) into the
 database: cleans known extraction artifacts, splits into structural
 parent/child chunks, generates a short contextual summary per child,
 embeds, and stores everything.
@@ -26,6 +26,7 @@ load_dotenv()
 EMBEDDING_MODEL = "text-embedding-3-small"
 EMBEDDING_DIMENSION = 384
 CONTEXT_MODEL = "gpt-4o-mini"
+MAX_PARENT_TOKENS = 1500  # safety net — see split_oversized_parent below
 
 client = AsyncOpenAI(api_key=os.getenv("OPEN_AI_KEY"))
 
@@ -33,20 +34,20 @@ client = AsyncOpenAI(api_key=os.getenv("OPEN_AI_KEY"))
 # ---------------------------------------------------------------------------
 # Cleaning
 #
-# Known extraction artifacts in this book's PDFs:
-#   - "✞ ✝ ☎ ✆" are leftover box-drawing glyphs from a LaTeX package used to
-#     frame Remarque/Exemple boxes. Pure noise, strip them.
-#   - Blackboard-bold letters (𝕂, ℝ, ℕ, ℂ) extract as a plain "I" followed
-#     by the ordinary letter, since the double-struck glyph has no single
-#     Unicode codepoint in this PDF's embedded font.
-#   - Some decorative-font headings (the chapter title, and — we found in
-#     THIS file specifically — "Exemple(s)" labels) extract as garbled
-#     strings of random-looking capitals. We do NOT attempt to byte-repair
-#     these here: the mapping is inconsistent per-heading and not worth the
-#     fragility. Practical effect: an "Exemple" block simply won't match
-#     HEADING_PATTERN below and folds into whichever theorem/definition
-#     precedes it, which is a reasonable default since it's supporting
-#     content for that statement anyway.
+# LlamaParse does NOT have Docling's decorative-font corruption issue (no
+# garbled chapter titles, no garbled "Exemples"/"Remarques" — verified by
+# direct comparison against the same passages in both outputs). What it
+# does still leave behind:
+#   - Repeated running headers/footers: a bare page number on its own
+#     line, and "Chapitre N. *<chapter name>*" repeated at every page break.
+#   - Markdown image placeholders, e.g. "![icon: ...](page_2_image_1.jpg)".
+#   - One observed stray HTML artifact leaking into LaTeX: <sub>...</sub>
+#     tags inside a formula (e.g. "\\bigoplus_{<sub>k=1</sub>}").
+#   - "✞ ✝ ☎ ✆" box-drawing remnants — kept as a defensive no-op strip in
+#     case they appear; not confirmed present in this source.
+# The blackboard-bold "I K" -> 𝕂 fix from the Docling version is no longer
+# needed (LlamaParse already emits \mathbb{K} etc. directly) but is left in
+# as a harmless no-op safety net.
 # ---------------------------------------------------------------------------
 _BOX_GLYPHS = {"✞", "✝", "☎", "✆"}
 
@@ -57,6 +58,20 @@ _BLACKBOARD_MAP = {
     r"\bI C\b": "ℂ",
 }
 
+# A line that's exactly "Chapitre <num>. <italicized or bold chapter name>"
+# and nothing else — the repeated running header. Generic on purpose (no
+# hardcoded chapter name) so it works on other chapters too.
+_RUNNING_HEADER = re.compile(r"^Chapitre\s+\d+\.\s*\*{1,2}.*\*{1,2}\s*$")
+
+# A line that's just a bare page number.
+_BARE_PAGE_NUMBER = re.compile(r"^\d{1,4}$")
+
+# Markdown image placeholders — pure layout noise for our purposes.
+_IMAGE_PLACEHOLDER = re.compile(r"!\[[^\]]*\]\([^)]*\)")
+
+# Stray HTML tags observed leaking into LaTeX formulas.
+_STRAY_HTML_TAGS = re.compile(r"</?su[bp]>")
+
 
 def normalize_blackboard_bold(text: str) -> str:
     for pattern, repl in _BLACKBOARD_MAP.items():
@@ -65,9 +80,11 @@ def normalize_blackboard_bold(text: str) -> str:
 
 
 def clean_markdown(md_text: str) -> str:
-    kept_lines = []
+    text = _IMAGE_PLACEHOLDER.sub("", md_text)
+    text = _STRAY_HTML_TAGS.sub("", text)
 
-    for line in md_text.splitlines():
+    kept_lines = []
+    for line in text.splitlines():
         stripped = line.strip()
 
         if not stripped:
@@ -77,12 +94,10 @@ def clean_markdown(md_text: str) -> str:
         if stripped in _BOX_GLYPHS:
             continue
 
-        # All-caps garbled running headers/footers (the decorative-font
-        # artifacts), heuristically: long, fully uppercase, no lowercase.
-        if stripped.isupper() and not any(c.islower() for c in stripped) and len(stripped) > 3:
+        if _RUNNING_HEADER.match(stripped):
             continue
 
-        if re.fullmatch(r"[A-Z]{2}", stripped):
+        if _BARE_PAGE_NUMBER.match(stripped):
             continue
 
         kept_lines.append(line)
@@ -96,18 +111,66 @@ def clean_markdown(md_text: str) -> str:
 # ---------------------------------------------------------------------------
 # Structural chunking
 #
-# Docling emits headings as "## Définition 1", "## Proposition 5", etc.
-# The optional "#{1,3}" prefix absorbs the markdown marker whether or not
-# it's present. The number group is optional too, since "Point méthode"
-# and some "Remarque"/"Théorème (Nom du théorème)" blocks carry no plain
-# digit numbering.
+# LlamaParse headings vary in level ("##" or "###") and are often, but not
+# always, wrapped in bold markers: "### **Définition 1**", "## Remarques"
+# (no bold), "## **Théorème 68**". The pattern below optionally consumes
+# "#" markers, then optional "**" on both sides of the label and number
+# independently, so it matches all observed variants.
+#
+# "Exemple(s)" and "Remarque(s)" are now included — they extract cleanly
+# under LlamaParse, unlike under Docling. Both singular/plural forms are
+# matched and normalized to a canonical singular chunk_type afterward.
 # ---------------------------------------------------------------------------
 HEADING_PATTERN = re.compile(
     r"^(?:#{1,3}\s*)?"
-    r"(Définition|Théorème|Proposition|Exercice|Corollaire|Lemme|Remarque|Point méthode)"
-    r"(?:\s+(\d+(?:\.\d+)?))?",
+    r"\*{0,2}"
+    r"(Définition|Théorème|Proposition|Exercice|Corollaire|Lemme|"
+    r"Remarques?|Exemples?|Point méthode)"
+    r"(?:[ \t]+(\d+(?:\.\d+)?))?"
+    r"\*{0,2}",
     re.MULTILINE,
 )
+
+# The end-of-chapter "S'entraîner et approfondir" section: each exercise is
+# a bold number at line start, numbered <chapter>.<exercise>, e.g.
+# "**2.1** Soit u ∈ L(E)..." — never uses the word "Exercice" at all.
+TRAINING_EXERCISE_PATTERN = re.compile(
+    r"^\*{0,2}(\d+\.\d+)\*{0,2}\s+(?=\S)",
+    re.MULTILINE,
+)
+
+# Multi-part block types: like Exercice, these can contain several
+# numbered sub-items (1. ..., 2. ...) separated by blank lines. Taking
+# only the first paragraph would truncate them, same issue we found with
+# Exercice under Docling.
+_MULTI_PART_TYPES = {"Exercice", "Exemple", "Remarque"}
+
+_CANONICAL_TYPE = {
+    "Exemples": "Exemple",
+    "Remarques": "Remarque",
+}
+
+
+def normalize_chunk_type(raw_type: str) -> str:
+    return _CANONICAL_TYPE.get(raw_type, raw_type)
+
+
+def find_all_headings(markdown_text: str) -> list[tuple[int, int, str, str | None]]:
+    """
+    Combines both heading formats into one position-sorted list of
+    (start, end_of_heading_match, chunk_type, number) tuples.
+    """
+
+    found: list[tuple[int, int, str, str | None]] = []
+
+    for m in HEADING_PATTERN.finditer(markdown_text):
+        found.append((m.start(), m.end(), normalize_chunk_type(m.group(1)), m.group(2)))
+
+    for m in TRAINING_EXERCISE_PATTERN.finditer(markdown_text):
+        found.append((m.start(), m.end(), "Exercice", m.group(1)))
+
+    found.sort(key=lambda x: x[0])
+    return found
 
 
 def split_statement_from_block(
@@ -118,30 +181,27 @@ def split_statement_from_block(
 ) -> str:
     """
     Pulls the bare statement out of the text AFTER a heading (the heading
-    itself, e.g. "## Proposition 62", is already stripped by the caller —
-    see chunk_by_structure's use of match.end()).
+    itself is already stripped by the caller — see chunk_by_structure's
+    use of heading_end).
 
     Most block types: statement ends at the first "Démonstration" marker,
     or the first blank-line paragraph break, whichever comes first.
 
-    Exercices: often contain multiple numbered sub-questions (1. ..., 2. ...)
-    each separated by a blank line. Taking only the first paragraph would
-    silently truncate the exercise down to its first sub-question, so for
-    exercises we keep the whole thing up to an optional trailing
-    "Indication" hint section instead.
+    Multi-part types (Exercice, Exemple, Remarque): can contain several
+    numbered sub-items across paragraph breaks — keep the whole thing up
+    to an optional trailing "Indication" hint section, rather than
+    truncating to just the first sub-item.
 
-    Some headings (mostly in the book's end-of-chapter "solutions" section,
-    which repeats each item's number as its own heading before giving only
-    the proof — no restated statement) have NOTHING before "Démonstration".
-    In that case candidate ends up empty; rather than silently produce an
-    empty/heading-only chunk, we fall back to the start of the proof itself
-    so the chunk still carries real, searchable content.
+    Some headings (the solutions-section entries, which repeat an item's
+    number before giving only its proof) have nothing before
+    "Démonstration". Rather than produce an empty/heading-only chunk, we
+    fall back to the start of the proof itself.
     """
 
     demo_split = re.split(r"\n\s*Démonstration", body_text, maxsplit=1)
     candidate = demo_split[0].strip()
 
-    if chunk_type == "Exercice":
+    if chunk_type in _MULTI_PART_TYPES:
         indication_split = re.split(r"\n\s*Indication", candidate, maxsplit=1)
         statement = indication_split[0].strip()
     else:
@@ -149,9 +209,6 @@ def split_statement_from_block(
         statement = paragraphs[0] if paragraphs else ""
 
     if not statement:
-        # Likely a solutions-section entry: heading immediately followed by
-        # "Démonstration" with no restated statement. Use the proof's own
-        # opening instead of leaving this chunk empty.
         statement = body_text.strip()
 
     tokens = tokenizer.encode(statement)
@@ -161,58 +218,91 @@ def split_statement_from_block(
     return statement.strip()
 
 
+def split_oversized_parent(unit: dict, tokenizer, max_tokens: int = MAX_PARENT_TOKENS) -> list[dict]:
+    """
+    Safety net for any block that ends up unexpectedly large — e.g. if a
+    heading format we haven't seen yet causes HEADING_PATTERN to miss a
+    long stretch of the document. Splits on paragraph boundaries into
+    several smaller parents, each within max_tokens. Does not fix the root
+    cause — just guarantees no single chunk can blow up an LLM's context
+    window or exceed the embedding model's input limit. Logs when it
+    triggers, since that's a signal worth investigating.
+    """
+
+    if unit["parent_tokens"] <= max_tokens:
+        return [unit]
+
+    print(
+        f"  [warn] oversized parent ({unit['chunk_type']} {unit['number']}, "
+        f"{unit['parent_tokens']} tokens) — splitting as a safety net. "
+        f"This usually means HEADING_PATTERN missed real headings nearby."
+    )
+
+    paragraphs = [p for p in unit["parent_content"].split("\n\n") if p.strip()]
+
+    sub_chunks: list[str] = []
+    current: list[str] = []
+    current_tokens = 0
+
+    for para in paragraphs:
+        para_tokens = len(tokenizer.encode(para))
+        if current and current_tokens + para_tokens > max_tokens:
+            sub_chunks.append("\n\n".join(current))
+            current = []
+            current_tokens = 0
+        current.append(para)
+        current_tokens += para_tokens
+
+    if current:
+        sub_chunks.append("\n\n".join(current))
+
+    split_units = []
+    for i, sub_content in enumerate(sub_chunks, start=1):
+        sub_number = f"{unit['number']}-part{i}" if unit["number"] else f"part{i}"
+        sub_tokens = tokenizer.encode(sub_content)
+        child_cap = min(120, len(sub_tokens))
+        child_content = tokenizer.decode(sub_tokens[:child_cap]).strip()
+
+        split_units.append(
+            {
+                "chunk_type": unit["chunk_type"],
+                "number": sub_number,
+                "parent_content": sub_content,
+                "parent_tokens": len(sub_tokens),
+                "child_content": child_content,
+                "child_tokens": child_cap,
+            }
+        )
+
+    return split_units
+
+
 def chunk_by_structure(markdown_text: str, tokenizer) -> list[dict]:
     """
     Splits cleaned markdown into structural units. Each unit carries both
-    a PARENT payload (the full block, heading included) and a CHILD
-    payload (the bare statement, heading excluded).
+    a PARENT payload (full block, heading included) and a CHILD payload
+    (bare statement, heading excluded).
 
-    This book repeats certain (chunk_type, number) pairs: once as the real
-    statement in the main "cours" text, and again later in a "Démonstrations
-    et solutions des exercices du cours" section, where the heading is
-    followed only by the proof/solution, no restated statement. Verified
-    against real data (Exercice 1, Proposition 62) that these repeats are
-    genuinely the same item's statement + solution, not two unrelated items
-    that happen to share a number — so a second occurrence of a
-    (chunk_type, number) pair is merged into the FIRST occurrence's parent
-    content (as its solution/démonstration) rather than becoming its own
-    top-level unit. The child (embedded, searchable) stays just the
-    original clean statement either way — a solution fragment should never
-    be the thing retrieval matches against.
-
-    NOTE: if a later, separate "Exercices" section in this book restarts
-    its own numbering from 1, this heuristic would incorrectly merge an
-    unrelated exercise into an earlier one with the same number. Worth
-    re-checking duplicate counts after processing the full document before
-    trusting this blindly on other chapters.
+    Repeated (chunk_type, number) pairs — the solutions-section entries —
+    are merged into the FIRST occurrence's parent as a tagged solution
+    block, rather than becoming their own top-level unit. Verified against
+    real data (Exercice 1, Proposition 62 under the Docling source) that
+    these repeats are genuinely the same item's statement + solution.
     """
 
-    matches = list(HEADING_PATTERN.finditer(markdown_text))
+    matches = find_all_headings(markdown_text)
     units_by_key: dict[tuple[str, str | None], dict] = {}
     ordered_keys: list[tuple[str, str | None]] = []
 
-    for i, match in enumerate(matches):
-        start = match.start()
-        end = matches[i + 1].start() if i + 1 < len(matches) else len(markdown_text)
+    for i, (start, heading_end, chunk_type, number) in enumerate(matches):
+        end = matches[i + 1][0] if i + 1 < len(matches) else len(markdown_text)
 
         block = markdown_text[start:end].strip()
-
-        # Slice off exactly the matched heading text (e.g. "## Proposition
-        # 62"), not a fixed number of lines — this correctly handles both
-        # "heading and content on the same line" and "heading, then a
-        # blank line, then content" without accidentally keeping or
-        # dropping either format's real content.
-        body_after_heading = markdown_text[match.end():end].strip()
-
-        chunk_type = match.group(1)
-        number = match.group(2)  # may be None
+        body_after_heading = markdown_text[heading_end:end].strip()
 
         key = (chunk_type, number)
 
         if number is not None and key in units_by_key:
-            # Second occurrence of a numbered heading — treat as the
-            # solution/démonstration for the first occurrence, fold it
-            # into that unit's parent rather than creating a new one.
             existing = units_by_key[key]
             existing["parent_content"] = (
                 f"{existing['parent_content']}\n\n"
@@ -235,14 +325,16 @@ def chunk_by_structure(markdown_text: str, tokenizer) -> list[dict]:
         units_by_key[key] = unit
         ordered_keys.append(key)
 
-    return [units_by_key[k] for k in ordered_keys]
+    final_units = []
+    for key in ordered_keys:
+        final_units.extend(split_oversized_parent(units_by_key[key], tokenizer))
+
+    return final_units
 
 
 # ---------------------------------------------------------------------------
-# Contextual retrieval: one short LLM-written summary per child, generated
-# once at ingest time, used only to enrich what gets embedded. This is what
-# lets a vaguely-phrased student question still match a terse book
-# statement that never uses the student's wording.
+# Contextual retrieval — one short LLM-written summary per child, generated
+# once at ingest time, used only to enrich what gets embedded.
 # ---------------------------------------------------------------------------
 CONTEXT_SYSTEM_PROMPT = (
     "You situate a short math-course excerpt within its chapter. "
@@ -301,7 +393,6 @@ async def ingest_markdown_file(markdown_path: str, title: str):
               "against this document's actual heading format before proceeding.")
         return
 
-    # Quick sanity print so you can eyeball quality before it hits the DB.
     for u in units[:5]:
         label = f"{u['chunk_type']} {u['number']}" if u["number"] else u["chunk_type"]
         preview = u["child_content"][:80].replace("\n", " ")
@@ -316,7 +407,7 @@ async def ingest_markdown_file(markdown_path: str, title: str):
             parsed_markdown=parsed_markdown,
         )
         session.add(document)
-        await session.flush()  # get document.id without committing yet
+        await session.flush()
 
         print("Generating contextual summaries (one LLM call per unit)...")
         context_summaries = []
@@ -363,7 +454,7 @@ async def ingest_markdown_file(markdown_path: str, title: str):
                 )
             )
         session.add_all(parent_rows)
-        await session.flush()  # get parent_row.id values
+        await session.flush()
 
         child_rows = []
         for unit, parent_row, data_item, summary in zip(
