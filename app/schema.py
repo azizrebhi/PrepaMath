@@ -19,7 +19,7 @@ class AskResponse(BaseModel):
 
 class RetrieveRequest(BaseModel):
     query: str = Field(min_length=2)
-    limit: int = Field(default=5, ge=1, le=20)
+    limit: int = Field(default=10, ge=1, le=20)
     
 
 class RetrievedChunk(BaseModel):

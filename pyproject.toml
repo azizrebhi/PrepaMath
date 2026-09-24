@@ -15,6 +15,7 @@ dependencies = [
     "psycopg2>=2.9.13",
     "psycopg2-binary>=2.9.13",
     "redis>=8.1.0",
+    "sentence-transformers>=6.1.0",
     "sqlalchemy>=2.0.54",
     "tiktoken>=0.14.0",
     "uvicorn[standard]>=0.53.0",

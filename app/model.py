@@ -104,3 +104,27 @@ class DocumentChunk(Base):
     __table_args__ = (
         UniqueConstraint("document_id", "chunk_index", name="uq_document_chunk"),
     )
+class ChapterPart(Base):
+    """
+    One 'page' of a chapter as the student will navigate it — a curated,
+    contiguous run of DocumentParentChunk rows (e.g. one book section like
+    'Éléments propres'), NOT auto-derived from search. In-page Q&A reads
+    directly from a part's own chunks; no embedding/search call needed for
+    that flow. Search/embeddings remain for cross-references and
+    whole-book search — see DocumentChunk, unchanged.
+    """
+ 
+    __tablename__ = "chapter_part"
+ 
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    document_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("documents.id"), nullable=False, index=True
+    )
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    order_index: Mapped[int] = mapped_column(Integer, nullable=False)
+ 
+    __table_args__ = (
+        UniqueConstraint("document_id", "order_index", name="uq_chapter_part_order"),
+    )
