@@ -1,0 +1,660 @@
+{
+  "_schema_notes": [
+    "document_title (not document_id) identifies the source chapter — resolved to the current Document.id at eval time via evaluation/common.py, since re-ingestion assigns a fresh UUID every run.",
+    "relevant_chunks entries are {chunk_type, number} pairs (not raw parent_index integers) — resolved to the current DocumentParentChunk.parent_index at eval time, since parent_index is assignment-order-dependent and would go stale across re-ingests. See evaluation/common.py:resolve_chunk_ref.",
+    "expected_ingestion_gap: true marks queries deliberately targeting content known to be dropped/overwritten by the unnumbered Exemple/Remarque collision bug in task.py (see code review). These should FAIL to resolve until that bug is fixed and the chapter is re-ingested — validate_dataset.py reports them separately rather than as dataset errors.",
+    "content_snippet (optional) is a short verbatim excerpt used as an extra sanity check that the resolved parent's content is actually the intended passage, not just a coincidentally-matching (chunk_type, number).",
+    "document_title now lives on each question (not top-level) — the dataset spans multiple chapters/documents."
+  ],
+  "questions": [
+    {
+      "id": "q01",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "definition",
+      "query": "Comment définit-on un sous-espace vectoriel stable par un endomorphisme ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Définition",
+          "number": "1"
+        }
+      ],
+      "content_snippet": "Un sous-espace vectoriel F de E est dit stable par u si u(F) ⊂ F"
+    },
+    {
+      "id": "q02",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "definition",
+      "query": "Qu'est-ce que l'endomorphisme induit par u sur un sous-espace stable F ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Définition",
+          "number": "2"
+        }
+      ],
+      "content_snippet": "On appelle endomorphisme induit par u sur F"
+    },
+    {
+      "id": "q03",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "definition",
+      "query": "Comment définit-on le polynôme caractéristique d'un endomorphisme ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Définition",
+          "number": "10"
+        }
+      ],
+      "content_snippet": "On appelle polynôme caractéristique de l'endomorphisme"
+    },
+    {
+      "id": "q04",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "theorem",
+      "query": "Si deux endomorphismes u et v commutent, que peut-on dire de Ker v et Im v vis-à-vis de u ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Proposition",
+          "number": "1"
+        }
+      ],
+      "content_snippet": "Ker v et Im v sont stables par u"
+    },
+    {
+      "id": "q05",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "theorem",
+      "query": "À quelle condition sur les vecteurs générateurs un sous-espace engendré par une famille est-il stable par u ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Proposition",
+          "number": "2"
+        }
+      ],
+      "content_snippet": "u(e_i) \\in F"
+    },
+    {
+      "id": "q06",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "theorem",
+      "query": "Comment se traduit matriciellement la stabilité d'un sous-espace F par un endomorphisme u ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Corollaire",
+          "number": "3"
+        }
+      ],
+      "content_snippet": "triangulaire par blocs"
+    },
+    {
+      "id": "q07",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "theorem",
+      "query": "Que dit la proposition donnant le degré, le coefficient dominant et le terme constant du polynôme caractéristique d'un endomorphisme ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Proposition",
+          "number": "29"
+        }
+      ],
+      "content_snippet": "unitaire, de degré $n$"
+    },
+    {
+      "id": "q08",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "theorem",
+      "query": "Un scalaire est valeur propre de u à quelle condition sur le polynôme caractéristique ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Théorème",
+          "number": "30"
+        }
+      ],
+      "content_snippet": "racine du polynôme caractéristique"
+    },
+    {
+      "id": "q09",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "theorem",
+      "query": "Sous quelle condition sur son polynôme caractéristique un endomorphisme est-il diagonalisable, en fonction des dimensions des sous-espaces propres ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Théorème",
+          "number": "44"
+        }
+      ],
+      "content_snippet": "diagonalisable si, et seulement si"
+    },
+    {
+      "id": "q10",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "theorem",
+      "query": "À quelle condition sur son polynôme caractéristique un endomorphisme est-il trigonalisable ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Théorème",
+          "number": "48"
+        }
+      ],
+      "content_snippet": "trigonalisable"
+    },
+    {
+      "id": "q11",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "theorem",
+      "query": "Quelles sont les conditions équivalentes à la diagonalisabilité d'un endomorphisme en termes de polynôme annulateur scindé à racines simples ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Théorème",
+          "number": "60"
+        }
+      ],
+      "content_snippet": "scindé à racines simples"
+    },
+    {
+      "id": "q12",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "theorem",
+      "query": "Si u est diagonalisable, pourquoi l'endomorphisme induit sur un sous-espace stable F est-il lui aussi diagonalisable ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Corollaire",
+          "number": "61"
+        }
+      ],
+      "content_snippet": "u_F est diagonalisable"
+    },
+    {
+      "id": "q13",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "theorem",
+      "query": "Quel est le polynôme caractéristique d'un endomorphisme nilpotent d'indice r ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Proposition",
+          "number": "62"
+        }
+      ],
+      "content_snippet": "nilpotent d'indice"
+    },
+    {
+      "id": "q14",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "proof",
+      "query": "Comment démontre-t-on que deux matrices semblables ont le même polynôme caractéristique ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Lemme",
+          "number": "28"
+        }
+      ],
+      "content_snippet": "Deux matrices semblables ont même polynôme caractéristique"
+    },
+    {
+      "id": "q15",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "proof",
+      "query": "Quelle est la démonstration du théorème caractérisant les valeurs propres comme racines du polynôme caractéristique ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Théorème",
+          "number": "30"
+        }
+      ],
+      "content_snippet": "n'est pas inversible"
+    },
+    {
+      "id": "q16",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "proof",
+      "query": "Comment prouve-t-on par récurrence qu'un endomorphisme dont le polynôme caractéristique est scindé est trigonalisable ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Théorème",
+          "number": "48"
+        }
+      ],
+      "content_snippet": "récurrence"
+    },
+    {
+      "id": "q17",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "exercise",
+      "query": "Comment montrer qu'un endomorphisme stabilisant tous les sous-espaces vectoriels de E est une homothétie ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Exercice",
+          "number": "1"
+        }
+      ],
+      "content_snippet": "la famille $(*x, u*(x))$ est liée"
+    },
+    {
+      "id": "q18",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "exercise",
+      "query": "Quels sont les sous-espaces vectoriels de K[X] stables par la dérivation D ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Exercice",
+          "number": "2"
+        }
+      ],
+      "content_snippet": "la dérivation de $\\mathbb{K}[X]$"
+    },
+    {
+      "id": "q19",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "exercise",
+      "query": "Comment montrer que l'ensemble des endomorphismes stabilisant un sous-espace F donné est une sous-algèbre ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Exercice",
+          "number": "3"
+        }
+      ],
+      "content_snippet": "sous-algèbre"
+    },
+    {
+      "id": "q20",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "exercise",
+      "query": "Comment caractériser par leur matrice les endomorphismes stabilisant chaque droite ou chaque F_i d'une base donnée ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Exercice",
+          "number": "4"
+        }
+      ],
+      "content_snippet": "stabilisent chaque"
+    },
+    {
+      "id": "q21",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "exercise",
+      "query": "Comment exprimer le polynôme caractéristique d'un endomorphisme de rang 1 en fonction de sa trace ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Exercice",
+          "number": "18"
+        }
+      ],
+      "content_snippet": "de rang 1"
+    },
+    {
+      "id": "q22",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "exercise",
+      "query": "À quelle condition sur a, b, c la matrice triangulaire donnée est-elle diagonalisable ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Exercice",
+          "number": "23"
+        }
+      ],
+      "content_snippet": "diagonalisable"
+    },
+    {
+      "id": "q23",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "terminology_shift",
+      "expected_ingestion_gap": false,
+      "query": "Quel type d'endomorphisme stabilise tous les hyperplans de E ?",
+      "notes": "Deliberately paraphrases 'sous-espaces vectoriels' as 'hyperplans' to test semantic (not keyword) retrieval — modeled directly on the user's own observed example. Was expected_ingestion_gap:true before the unnumbered Exemple/Remarque overwrite bug in task.py was fixed; now resolves normally.",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Exemple",
+          "number": null
+        }
+      ],
+      "content_snippet": "une homothétie stabilise tous les sous-espaces vectoriels de $E$"
+    },
+    {
+      "id": "q24",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "known_ingestion_gap",
+      "expected_ingestion_gap": false,
+      "query": "Quels sont l'image et le noyau de l'endomorphisme induit u_F en fonction de F et de u ?",
+      "notes": "Targets an early unnumbered Remarque (right after Définition 2). Was expected_ingestion_gap:true before the fix (another unnumbered Remarque used to overwrite it during ingestion); now resolves normally.",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Remarque",
+          "number": null
+        }
+      ],
+      "content_snippet": "L'image de $u_F$ est égale à $u(F)$"
+    },
+    {
+      "id": "q25",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "known_ingestion_gap",
+      "expected_ingestion_gap": false,
+      "query": "Combien de valeurs propres distinctes un endomorphisme d'un espace de dimension n peut-il avoir au maximum ?",
+      "notes": "Targets the unnumbered Remarque right after Théorème 30. Was expected_ingestion_gap:true before the fix; now resolves normally (content_snippet had to be made more specific since a near-duplicate Remarque about matrices, not endomorphisms, shares the same trailing sentence).",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Remarque",
+          "number": null
+        }
+      ],
+      "content_snippet": "endomorphisme d’un espace vectoriel de dimension $n$ a au plus $n$ valeurs propres distinctes"
+    },
+    {
+      "id": "q26",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "multi_context",
+      "query": "Pourquoi le polynôme caractéristique de l'endomorphisme induit sur un sous-espace stable divise-t-il celui de l'endomorphisme complet, et comment cela se traduit-il sur la matrice par blocs ?",
+      "notes": "Requires combining the block-triangular matrix form of stability (Corollaire 3) with the divisibility result for the induced characteristic polynomial (Proposition 33) — a single chunk answers only half the question.",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Corollaire",
+          "number": "3"
+        },
+        {
+          "chunk_type": "Proposition",
+          "number": "33"
+        }
+      ],
+      "content_snippet": "divise le polynôme scindé"
+    },
+    {
+      "id": "q27",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "multi_context",
+      "query": "En quoi le théorème de caractérisation de la diagonalisabilité par un polynôme annulateur explique-t-il que l'endomorphisme induit sur un sous-espace stable reste diagonalisable ?",
+      "notes": "Requires combining Théorème 60 (diagonalizability via a split-simple annihilating polynomial) with Corollaire 61 (the induced endomorphism inherits it).",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Théorème",
+          "number": "60"
+        },
+        {
+          "chunk_type": "Corollaire",
+          "number": "61"
+        }
+      ],
+      "content_snippet": "scindé à racines simples"
+    },
+    {
+      "id": "q28",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "chapter_part",
+      "query": "Dans la partie du chapitre consacrée aux endomorphismes trigonalisables, quelle condition sur le polynôme caractéristique caractérise la trigonalisabilité ?",
+      "notes": "Scoped to section IV ('Endomorphismes et matrices trigonalisables') per the chapter's own table of contents — tests whether retrieval stays within the right section rather than pulling in the analogous diagonalizability result (Théorème 44) from section III.",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Théorème",
+          "number": "48"
+        }
+      ],
+      "content_snippet": "trigonalisable"
+    },
+    {
+      "id": "q29",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "chapter_part",
+      "query": "Dans la partie sur les éléments propres d'un endomorphisme, comment le polynôme caractéristique s'exprime-t-il à partir de la trace et du déterminant ?",
+      "notes": "Scoped to section II ('Éléments propres') per the table of contents.",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Proposition",
+          "number": "29"
+        }
+      ],
+      "content_snippet": "\\text{Tr } u"
+    },
+    {
+      "id": "q30",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "definition",
+      "query": "Quelles sont les trois propriétés qu'une application doit vérifier pour être une norme sur un espace vectoriel ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Définition",
+          "number": "1"
+        }
+      ],
+      "content_snippet": "vérifiant les trois propriétés suivantes"
+    },
+    {
+      "id": "q31",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "definition",
+      "query": "Comment définit-on la distance associée à une norme ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Définition",
+          "number": "4"
+        }
+      ],
+      "content_snippet": "distance associée à la norme"
+    },
+    {
+      "id": "q32",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "definition",
+      "query": "Que signifie qu'une suite d'éléments d'un espace vectoriel normé converge vers une limite ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Définition",
+          "number": "10"
+        }
+      ],
+      "content_snippet": "tend vers 0"
+    },
+    {
+      "id": "q33",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "definition",
+      "query": "Quelle est la définition d'une partie dense dans une autre ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Définition",
+          "number": "19"
+        }
+      ],
+      "content_snippet": "est dite dense"
+    },
+    {
+      "id": "q34",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "definition",
+      "query": "Comment définit-on la frontière d'une partie A ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Définition",
+          "number": "20"
+        }
+      ],
+      "content_snippet": "Fr(A)"
+    },
+    {
+      "id": "q35",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "theorem",
+      "query": "Que dit la proposition sur les inégalités triangulaires pour une norme ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Proposition",
+          "number": "1"
+        }
+      ],
+      "content_snippet": "Inégalités triangulaires"
+    },
+    {
+      "id": "q36",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "theorem",
+      "query": "Une suite dans un espace vectoriel normé peut-elle avoir deux limites différentes ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Proposition",
+          "number": "7"
+        }
+      ],
+      "content_snippet": "Unicité de la limite"
+    },
+    {
+      "id": "q37",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "theorem",
+      "query": "Que peut-on dire de la convergence d'une combinaison linéaire de deux suites convergentes ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Proposition",
+          "number": "8"
+        }
+      ],
+      "content_snippet": "Combinaison linéaire de deux suites convergentes"
+    },
+    {
+      "id": "q38",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "theorem",
+      "query": "Est-ce que toute suite convergente dans un espace vectoriel normé est bornée ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Corollaire",
+          "number": "10"
+        }
+      ],
+      "content_snippet": "Toute suite convergente est bornée"
+    },
+    {
+      "id": "q39",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "theorem",
+      "query": "À quelle condition une suite à valeurs dans un produit d'espaces vectoriels normés converge-t-elle ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Proposition",
+          "number": "11"
+        }
+      ],
+      "content_snippet": "pour tout $k \\in \\llbracket 1, p \\rrbracket$, la suite de terme général $a_n^{(k)}$ converge"
+    },
+    {
+      "id": "q40",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "theorem",
+      "query": "Comment l'intérieur, la frontière et l'extérieur d'une partie A se partitionnent-ils ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Proposition",
+          "number": "23"
+        }
+      ],
+      "content_snippet": "forment une partition de $E$"
+    },
+    {
+      "id": "q41",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "proof",
+      "query": "Comment démontre-t-on l'unicité de la limite d'une suite convergente à l'aide de l'inégalité triangulaire ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Proposition",
+          "number": "7"
+        }
+      ],
+      "content_snippet": "En passant à la limite"
+    },
+    {
+      "id": "q42",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "proof",
+      "query": "Pourquoi une suite convergente dans un espace vectoriel normé est-elle nécessairement bornée ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Corollaire",
+          "number": "10"
+        }
+      ],
+      "content_snippet": "la suite réelle $(\\|a_n\\|)_{n \\in \\mathbb{N}}$ est également convergente, donc bornée"
+    },
+    {
+      "id": "q43",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "exercise",
+      "query": "Comment montrer que l'application x en racine de (x|x) est une norme sur un espace préhilbertien réel ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Exercice",
+          "number": "1"
+        }
+      ],
+      "content_snippet": "espace préhilbertien réel"
+    },
+    {
+      "id": "q44",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "exercise",
+      "query": "Quelles propriétés vérifie la distance associée à une norme (séparation, symétrie, inégalité triangulaire, invariance) ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Exercice",
+          "number": "6"
+        }
+      ],
+      "content_snippet": "invariance par translation"
+    },
+    {
+      "id": "q45",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "exercise",
+      "query": "La suite des fonctions x puissance n converge-t-elle vers la fonction nulle pour la norme un mais pas pour la norme infinie ?",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Exercice",
+          "number": "21"
+        }
+      ],
+      "content_snippet": "$f_n(x) = x^n$"
+    },
+    {
+      "id": "q46",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "multi_context",
+      "query": "Pourquoi une suite convergente ne possède-t-elle que sa limite comme valeur d'adhérence ?",
+      "notes": "Requires combining Proposition 12 (every subsequence of a convergent sequence converges to the same limit) with Définition 12 (an accumulation value is the limit of some subsequence) — neither chunk alone states the conclusion.",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Proposition",
+          "number": "12"
+        },
+        {
+          "chunk_type": "Définition",
+          "number": "12"
+        }
+      ],
+      "content_snippet": "valeur d'adhérence"
+    },
+    {
+      "id": "q47",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "chapter_part",
+      "query": "Dans la partie sur la comparaison de normes, que signifie qu'une norme est dominée par une autre ?",
+      "notes": "Scoped to section IV ('Comparaison de normes') per the table of contents.",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Définition",
+          "number": "22"
+        }
+      ],
+      "content_snippet": "dominée"
+    },
+    {
+      "id": "q48",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "category": "terminology_shift",
+      "query": "Un ensemble qui n'est pas ouvert dans R peut-il tout de même être ouvert quand on le regarde comme une partie d'un sous-ensemble plus petit ?",
+      "notes": "Paraphrases 'intervalle' as 'ensemble' and avoids the term 'ouvert relatif' itself, to test semantic retrieval of the relative-openness concept from Exercice 42 rather than keyword overlap.",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Exercice",
+          "number": "42"
+        }
+      ],
+      "content_snippet": "ouvert relatif de"
+    }
+  ]
+}

@@ -58,10 +58,15 @@ _BLACKBOARD_MAP = {
     r"\bI C\b": "ℂ",
 }
 
-# A line that's exactly "Chapitre <num>. <italicized or bold chapter name>"
-# and nothing else — the repeated running header. Generic on purpose (no
-# hardcoded chapter name) so it works on other chapters too.
-_RUNNING_HEADER = re.compile(r"^Chapitre\s+\d+\.\s*\*{1,2}.*\*{1,2}\s*$")
+# A line that's just "Chapitre <num>. <chapter name>" and nothing else — the
+# repeated running header. Generic on purpose (no hardcoded chapter name) so
+# it works on other chapters too. LlamaParse emits this in at least five
+# different decorations across a single document — plain, "# " heading,
+# italicized title, no italics at all, and bold wrapping the whole line
+# ("# **Chapitre 2. *...*  **") — so this only anchors on the literal
+# "Chapitre <num>." prefix (never a legitimate start of real content) and
+# accepts whatever formatting follows it as the title.
+_RUNNING_HEADER = re.compile(r"^#{0,3}\s*\*{0,3}\s*Chapitre\s+\d+\.\s*.*$")
 
 # A line that's just a bare page number.
 _BARE_PAGE_NUMBER = re.compile(r"^\d{1,4}$")
@@ -72,6 +77,12 @@ _IMAGE_PLACEHOLDER = re.compile(r"!\[[^\]]*\]\([^)]*\)")
 # Stray HTML tags observed leaking into LaTeX formulas.
 _STRAY_HTML_TAGS = re.compile(r"</?su[bp]>")
 
+# Raw HTML blocks LlamaParse sometimes emits verbatim (e.g. a table-of-
+# contents <table>, or a <mark>p.114</mark> page marker) — never meaningful
+# content on their own, and left un-stripped they get embedded as literal
+# markup. DOTALL so a multi-line <table>...</table> is removed as one block.
+_HTML_BLOCK_TAGS = re.compile(r"<(table|mark)\b.*?</\1>", re.DOTALL | re.IGNORECASE)
+
 
 def normalize_blackboard_bold(text: str) -> str:
     for pattern, repl in _BLACKBOARD_MAP.items():
@@ -80,7 +91,8 @@ def normalize_blackboard_bold(text: str) -> str:
 
 
 def clean_markdown(md_text: str) -> str:
-    text = _IMAGE_PLACEHOLDER.sub("", md_text)
+    text = _HTML_BLOCK_TAGS.sub("", md_text)
+    text = _IMAGE_PLACEHOLDER.sub("", text)
     text = _STRAY_HTML_TAGS.sub("", text)
 
     kept_lines = []
@@ -211,9 +223,14 @@ def split_statement_from_block(
     if not statement:
         statement = body_text.strip()
 
-    tokens = tokenizer.encode(statement)
-    if len(tokens) > max_statement_tokens:
-        statement = tokenizer.decode(tokens[:max_statement_tokens])
+    # Multi-part blocks are deliberately kept whole above — truncating them
+    # here to the same cap as a single-paragraph statement would undo that
+    # and cut off later sub-questions/examples. Only cap the single-
+    # paragraph case.
+    if chunk_type not in _MULTI_PART_TYPES:
+        tokens = tokenizer.encode(statement)
+        if len(tokens) > max_statement_tokens:
+            statement = tokenizer.decode(tokens[:max_statement_tokens])
 
     return statement.strip()
 
@@ -288,11 +305,38 @@ def chunk_by_structure(markdown_text: str, tokenizer) -> list[dict]:
     block, rather than becoming their own top-level unit. Verified against
     real data (Exercice 1, Proposition 62 under the Docling source) that
     these repeats are genuinely the same item's statement + solution.
+
+    Unnumbered headings (bare "Exemples"/"Remarques", no number) are never
+    solution-section repeats — there is no earlier numbered occurrence to
+    attach a solution to — so each one must become its own unit. They are
+    NOT merge-eligible; giving them a shared (chunk_type, None) key here
+    previously caused every unnumbered Exemple/Remarque in a chapter to
+    silently overwrite the previous one, so only the last one ever survived
+    ingestion (confirmed against a real chapter: ~74 of 234 stored rows
+    were duplicates of just two surviving blocks). Each gets a key unique
+    to its position (chunk_type, None, i) instead.
     """
 
     matches = find_all_headings(markdown_text)
-    units_by_key: dict[tuple[str, str | None], dict] = {}
-    ordered_keys: list[tuple[str, str | None]] = []
+    units_by_key: dict[tuple, dict] = {}
+    ordered_keys: list[tuple] = []
+
+    # Text before the first recognized heading (chapter title, intro
+    # paragraph setting up shared notation, etc.) was previously discarded
+    # outright — captured here as its own unit instead of being lost.
+    if matches and matches[0][0] > 0:
+        preamble = markdown_text[: matches[0][0]].strip()
+        if preamble:
+            preamble_key = ("Introduction", None, "preamble")
+            units_by_key[preamble_key] = {
+                "chunk_type": "Introduction",
+                "number": None,
+                "parent_content": preamble,
+                "parent_tokens": len(tokenizer.encode(preamble)),
+                "child_content": preamble,
+                "child_tokens": len(tokenizer.encode(preamble)),
+            }
+            ordered_keys.append(preamble_key)
 
     for i, (start, heading_end, chunk_type, number) in enumerate(matches):
         end = matches[i + 1][0] if i + 1 < len(matches) else len(markdown_text)
@@ -300,7 +344,7 @@ def chunk_by_structure(markdown_text: str, tokenizer) -> list[dict]:
         block = markdown_text[start:end].strip()
         body_after_heading = markdown_text[heading_end:end].strip()
 
-        key = (chunk_type, number)
+        key = (chunk_type, number) if number is not None else (chunk_type, None, i)
 
         if number is not None and key in units_by_key:
             existing = units_by_key[key]

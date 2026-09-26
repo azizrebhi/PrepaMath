@@ -1,2 +1,10 @@
 
 .env
+__pycache__/
+*.pyc
+
+# Full copyrighted source-textbook chapter text — not for publication.
+# See evaluation/RESULTS.md and evaluation/dataset.json for the (short,
+# quoted) excerpts used to document/benchmark the pipeline instead.
+llamaparse_outout.md
+chap_topologie.md
