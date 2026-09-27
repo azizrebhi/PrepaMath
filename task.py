@@ -9,6 +9,7 @@ Usage:
 """
 
 import asyncio
+import bisect
 import os
 import re
 import sys
@@ -19,7 +20,7 @@ from dotenv import load_dotenv
 from openai import AsyncOpenAI
 
 from app.database import async_session_maker
-from app.model import Document, DocumentChunk, DocumentParentChunk
+from app.model import ChapterPart, Document, DocumentChunk, DocumentParentChunk
 
 load_dotenv()
 
@@ -185,6 +186,57 @@ def find_all_headings(markdown_text: str) -> list[tuple[int, int, str, str | Non
     return found
 
 
+# ---------------------------------------------------------------------------
+# Chapter sections (for ChapterPart / left-panel navigation)
+#
+# Each major section ("I Généralités", "II Suites d'éléments...") is a real
+# heading exactly once, but LlamaParse then repeats that same title as a
+# running header at every page break for as long as we're inside that
+# section — the same artifact as the chapter-title running header, just
+# scoped to the current section, and just as inconsistently decorated
+# (sometimes a leading "#", sometimes bold markers, sometimes neither).
+# Matching every occurrence would create one spurious ChapterPart per page.
+# Instead: section numerals only ever increase through a chapter (I, then
+# II, then III, ...), so a candidate line is only accepted as a genuine
+# section start when its numeral is strictly the next one expected — every
+# earlier repeat of the current section's own numeral is ignored as noise.
+# ---------------------------------------------------------------------------
+_ROMAN_SEQUENCE = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
+
+_SECTION_LINE_PATTERN = re.compile(
+    r"^#{0,3}\s*\*{0,3}\s*(I|II|III|IV|V|VI|VII|VIII|IX|X)\s+([A-ZÀ-Ý].*?)\**\s*$",
+    re.MULTILINE,
+)
+
+
+def find_sections(markdown_text: str) -> list[tuple[int, str]]:
+    """Returns [(start_pos, title), ...] for each chapter section, in
+    document order, deduplicated as described above."""
+
+    sections: list[tuple[int, str]] = []
+    next_expected = 0
+
+    for m in _SECTION_LINE_PATTERN.finditer(markdown_text):
+        if next_expected >= len(_ROMAN_SEQUENCE):
+            break
+        if m.group(1) != _ROMAN_SEQUENCE[next_expected]:
+            continue
+        title = m.group(2).replace("*", "").strip()
+        sections.append((m.start(), title))
+        next_expected += 1
+
+    return sections
+
+
+def section_index_for_position(position: int, section_starts: list[int]) -> int | None:
+    """Which section (by index into find_sections' result) a document
+    position falls under, or None if it's before the first section
+    (chapter title/intro front-matter)."""
+
+    idx = bisect.bisect_right(section_starts, position) - 1
+    return idx if idx >= 0 else None
+
+
 def split_statement_from_block(
     body_text: str,
     chunk_type: str,
@@ -288,13 +340,16 @@ def split_oversized_parent(unit: dict, tokenizer, max_tokens: int = MAX_PARENT_T
                 "parent_tokens": len(sub_tokens),
                 "child_content": child_content,
                 "child_tokens": child_cap,
+                "part_index": unit["part_index"],
             }
         )
 
     return split_units
 
 
-def chunk_by_structure(markdown_text: str, tokenizer) -> list[dict]:
+def chunk_by_structure(
+    markdown_text: str, tokenizer, sections: list[tuple[int, str]] | None = None
+) -> list[dict]:
     """
     Splits cleaned markdown into structural units. Each unit carries both
     a PARENT payload (full block, heading included) and a CHILD payload
@@ -318,6 +373,9 @@ def chunk_by_structure(markdown_text: str, tokenizer) -> list[dict]:
     """
 
     matches = find_all_headings(markdown_text)
+    if sections is None:
+        sections = find_sections(markdown_text)
+    section_starts = [start for start, _title in sections]
     units_by_key: dict[tuple, dict] = {}
     ordered_keys: list[tuple] = []
 
@@ -335,6 +393,7 @@ def chunk_by_structure(markdown_text: str, tokenizer) -> list[dict]:
                 "parent_tokens": len(tokenizer.encode(preamble)),
                 "child_content": preamble,
                 "child_tokens": len(tokenizer.encode(preamble)),
+                "part_index": section_index_for_position(0, section_starts),
             }
             ordered_keys.append(preamble_key)
 
@@ -364,6 +423,10 @@ def chunk_by_structure(markdown_text: str, tokenizer) -> list[dict]:
             "parent_tokens": len(tokenizer.encode(block)),
             "child_content": statement,
             "child_tokens": len(tokenizer.encode(statement)),
+            # Which section this chunk belongs to (its own heading's
+            # position, not the merged-in solution text's position, which
+            # may live in a different section further down the chapter).
+            "part_index": section_index_for_position(start, section_starts),
         }
 
         units_by_key[key] = unit
@@ -429,7 +492,11 @@ async def ingest_markdown_file(markdown_path: str, title: str):
     parsed_markdown = clean_markdown(raw_markdown)
     tokenizer = tiktoken.get_encoding("cl100k_base")
 
-    units = chunk_by_structure(parsed_markdown, tokenizer)
+    sections = find_sections(parsed_markdown)
+    print(f"Detected {len(sections)} chapter sections: "
+          f"{', '.join(title for _pos, title in sections)}")
+
+    units = chunk_by_structure(parsed_markdown, tokenizer, sections=sections)
     print(f"Chunked into {len(units)} structural units")
 
     if not units:
@@ -452,6 +519,20 @@ async def ingest_markdown_file(markdown_path: str, title: str):
         )
         session.add(document)
         await session.flush()
+
+        chapter_parts = [
+            ChapterPart(
+                id=uuid.uuid4(),
+                document_id=document.id,
+                title=section_title,
+                order_index=idx,
+            )
+            for idx, (_pos, section_title) in enumerate(sections)
+        ]
+        if chapter_parts:
+            session.add_all(chapter_parts)
+            await session.flush()
+        part_id_by_index = {idx: part.id for idx, part in enumerate(chapter_parts)}
 
         print("Generating contextual summaries (one LLM call per unit)...")
         context_summaries = []
@@ -491,6 +572,7 @@ async def ingest_markdown_file(markdown_path: str, title: str):
                     id=uuid.uuid4(),
                     document_id=document.id,
                     parent_index=idx,
+                    part_id=part_id_by_index.get(unit["part_index"]),
                     chunk_type=unit["chunk_type"],
                     number=unit["number"],
                     content=unit["parent_content"],

@@ -30,3 +30,9 @@ class RetrievedChunk(BaseModel):
 class RetrieveResponse(BaseModel):
     query: str
     results: list[RetrievedChunk]
+
+
+class ChapterPartOut(BaseModel):
+    id: UUID
+    title: str
+    order_index: int

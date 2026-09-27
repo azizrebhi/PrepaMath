@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from app.routers import retrieval 
+from app.routers import chapters, retrieval
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Starting up...")
@@ -15,6 +15,7 @@ app = FastAPI(lifespan=lifespan)
 # Include your auth router
 
 app.include_router(retrieval.router)
+app.include_router(chapters.router)
 
 
 

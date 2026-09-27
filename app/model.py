@@ -54,6 +54,13 @@ class DocumentParentChunk(Base):
     )
     parent_index: Mapped[int] = mapped_column(Integer, nullable=False)
 
+    # Which section (ChapterPart) this chunk falls under, for left-panel
+    # navigation. Nullable: front-matter (chapter title/intro, before the
+    # first detected section) doesn't belong to any section.
+    part_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("chapter_part.id"), nullable=True, index=True
+    )
+
     chunk_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
     number: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
