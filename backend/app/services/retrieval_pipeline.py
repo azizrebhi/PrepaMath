@@ -87,6 +87,7 @@ async def run_pipeline(
     # is validated by the harness to actually help; the code path is kept
     # for that future A/B test.
     use_rerank: bool = False,
+    document_id: str | None = None,
 ) -> PipelineResult:
     if not use_lexical and not use_semantic:
         raise ValueError("At least one of use_lexical/use_semantic must be enabled")
@@ -129,6 +130,8 @@ async def run_pipeline(
             .order_by(lex_rank.desc())
             .limit(CANDIDATE_POOL_SIZE)
         )
+        if document_id is not None:
+            lexical_stmt = lexical_stmt.where(DocumentChunk.document_id == document_id)
         lexical_rows = (await session.execute(lexical_stmt)).all()
 
     for rank, row in enumerate(lexical_rows, start=1):
@@ -161,6 +164,8 @@ async def run_pipeline(
             .order_by(sem_distance.asc())
             .limit(CANDIDATE_POOL_SIZE)
         )
+        if document_id is not None:
+            semantic_stmt = semantic_stmt.where(DocumentChunk.document_id == document_id)
         semantic_rows = (await session.execute(semantic_stmt)).all()
 
     for rank, row in enumerate(semantic_rows, start=1):

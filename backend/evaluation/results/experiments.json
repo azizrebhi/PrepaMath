@@ -97,5 +97,38 @@
     "timestamp": "2026-09-26T22:45:55.079638+00:00",
     "dataset_path": "C:\\Users\\maison info\\Desktop\\MATH\\evaluation\\dataset.json",
     "num_questions": 48
+  },
+  {
+    "config": "dense",
+    "use_lexical": false,
+    "use_semantic": true,
+    "use_rerank": false,
+    "limit": 10,
+    "git_commit": "28cd74d",
+    "timestamp": "2026-09-29T19:12:41.817647+00:00",
+    "dataset_path": "C:\\Users\\maison info\\Desktop\\MATH\\backend\\evaluation\\dataset.json",
+    "num_questions": 49
+  },
+  {
+    "config": "hybrid",
+    "use_lexical": true,
+    "use_semantic": true,
+    "use_rerank": false,
+    "limit": 10,
+    "git_commit": "28cd74d",
+    "timestamp": "2026-09-29T19:12:55.660904+00:00",
+    "dataset_path": "C:\\Users\\maison info\\Desktop\\MATH\\backend\\evaluation\\dataset.json",
+    "num_questions": 49
+  },
+  {
+    "config": "reranked",
+    "use_lexical": true,
+    "use_semantic": true,
+    "use_rerank": true,
+    "limit": 10,
+    "git_commit": "28cd74d",
+    "timestamp": "2026-09-29T19:18:17.851433+00:00",
+    "dataset_path": "C:\\Users\\maison info\\Desktop\\MATH\\backend\\evaluation\\dataset.json",
+    "num_questions": 49
   }
 ]

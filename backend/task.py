@@ -133,9 +133,23 @@ def clean_markdown(md_text: str) -> str:
 # "Exemple(s)" and "Remarque(s)" are now included — they extract cleanly
 # under LlamaParse, unlike under Docling. Both singular/plural forms are
 # matched and normalized to a canonical singular chunk_type afterward.
+#
+# Many exercise/definition/etc. headings are printed with a page-reference
+# prefix on the SAME line, e.g. "p.109 **Exercice 5** Soit E = ...". Since
+# this pattern is anchored at line-start (^), that prefix used to defeat
+# the match entirely (confirmed: 18 occurrences in the reduction chapter,
+# 28 in the topology chapter). The consequence isn't just a missed
+# boundary — the swallowed prompt merges into whatever unrelated block
+# precedes it, and when the same number resurfaces later in the
+# "Démonstrations et solutions" section (with no page prefix, so it DOES
+# match), that solution-only occurrence becomes the first-and-only unit
+# for that key, embedding solution prose instead of the actual question.
+# The optional page-prefix below fixes the anchor so the real prompt is
+# found first, as intended.
 # ---------------------------------------------------------------------------
 HEADING_PATTERN = re.compile(
-    r"^(?:#{1,3}\s*)?"
+    r"^(?:p\.\d+\s+)?"
+    r"(?:#{1,3}\s*)?"
     r"\*{0,2}"
     r"(Définition|Théorème|Proposition|Exercice|Corollaire|Lemme|"
     r"Remarques?|Exemples?|Point méthode)"

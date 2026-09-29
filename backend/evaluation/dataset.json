@@ -655,6 +655,20 @@
         }
       ],
       "content_snippet": "ouvert relatif de"
+    },
+    {
+      "id": "q49",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "category": "exercise",
+      "query": "Quelles sont les valeurs propres et les sous-espaces propres de l'endomorphisme de dérivation D sur E = C-infini(R,R) ?",
+      "notes": "Regression test for the HEADING_PATTERN page-prefix bug: the real prompt (\"p.109 **Exercice 5** Soit E = C^infini(R,R)...\") sat on one line with a page marker glued to the heading, defeating the ^-anchored regex — the prompt got swallowed into an unrelated Exemples block, and the solutions-section occurrence (no page prefix, so it matched fine) became the only unit for this key, embedding solution prose instead of the question. Confirmed via /ask: the real Exercice 5 chunk was absent from the top-5 retrieved sources despite being a near-verbatim match to this query. Should resolve correctly, with Exercice 5 among top sources, once the heading-pattern fix is ingested.",
+      "relevant_chunks": [
+        {
+          "chunk_type": "Exercice",
+          "number": "5"
+        }
+      ],
+      "content_snippet": "Déterminer les valeurs propres et les sous-espaces propres de $D$"
     }
   ]
 }
