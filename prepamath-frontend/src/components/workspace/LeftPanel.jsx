@@ -16,7 +16,7 @@ export default function LeftPanel() {
       try {
         const res = await fetch(`${API_BASE_URL}/documents/${chapterId}/parts`);
         if (!res.ok) {
-          throw new Error(`Request failed: ${res.status}`);
+          throw new Error(`Échec de la requête : ${res.status}`);
         }
         const data = await res.json();
         setParts(data);
@@ -28,40 +28,30 @@ export default function LeftPanel() {
     }
 
     fetchParts();
-  }, [chapterId]); // re-fetch if the user navig
+  }, [chapterId]);
 
-  // TODO 1: loading branch — return something simple, e.g. <p className="p-6">Loading...</p>
   if (loading) {
-    return <p className="p-6 text-neutral-100">Loading...</p>;
+    return <p className="p-6 text-neutral-100">Chargement...</p>;
   }
 
-  // TODO 2: error branch — return something showing `error` to the user,
-  // e.g. <p className="p-6 text-red-400">Failed to load: {error}</p>
   if (error) {
-    return <p className="p-6 text-red-400">Failed to load: {error}</p>;
+    return <p className="p-6 text-red-400">Échec du chargement : {error}</p>;
   }
 
   return (
     <div className="p-6 text-neutral-100">
-      {/* TODO 3: you now have a real `parts` ar
-          { id, title, order_index } objects. Render them — a plain
-          <ul> mapping over parts, showing part.
-          is a section-navigator list for now, not final section content
-          (that needs a backend endpoint that doesn't exist yet — next
-          conversation). */}
       <ul className="space-y-2">
-  {Array.isArray(parts) ? (
-    parts.map((part) => (
-      <li key={part.id} className="p-3 bg-neutral-900 border border-neutral-800 rounded">
-        <div>{part.title}</div>
-        <div className="text-xs text-neutral-500">Order: {part.order_index}</div>
-      </li>
-    ))
-  ) : (
-    <p className="text-sm text-neutral-400">No parts array structure found in API response.</p>
-  )}
-</ul>
-
+        {Array.isArray(parts) ? (
+          parts.map((part) => (
+            <li key={part.id} className="p-3 bg-neutral-900 border border-neutral-800 rounded">
+              <div>{part.title}</div>
+              <div className="text-xs text-neutral-500">Section {part.order_index}</div>
+            </li>
+          ))
+        ) : (
+          <p className="text-sm text-neutral-400">Réponse de l'API invalide.</p>
+        )}
+      </ul>
     </div>
   );
 }

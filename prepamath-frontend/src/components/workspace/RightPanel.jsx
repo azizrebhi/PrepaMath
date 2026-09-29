@@ -39,7 +39,7 @@ export default function RightPanel() {
         body: JSON.stringify({ query }),
       });
       if (!res.ok) {
-        throw new Error(`Request failed: ${res.status}`);
+        throw new Error(`Échec de la requête : ${res.status}`);
       }
       const data = await res.json();
       setMessages((prev) => [
@@ -56,15 +56,15 @@ export default function RightPanel() {
   return (
     <div className="flex flex-col h-full text-neutral-100">
       <div className="flex-shrink-0 flex items-center justify-between border-b border-neutral-800 p-4">
-        <span>AI Tutor</span>
+        <span>Tuteur IA</span>
         <span className="text-xs text-neutral-500">
-          {loading ? "Thinking..." : "Status: Active"}
+          {loading ? "Réflexion en cours..." : "Statut : actif"}
         </span>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <p className="text-sm text-neutral-500">Ask a question about this chapter.</p>
+          <p className="text-sm text-neutral-500">Pose une question sur ce chapitre.</p>
         )}
 
         {messages.map((m, i) => (
@@ -101,7 +101,7 @@ export default function RightPanel() {
         ))}
 
         {error && (
-          <p className="text-sm text-red-400">Failed to get an answer: {error}</p>
+          <p className="text-sm text-red-400">Échec de la réponse : {error}</p>
         )}
       </div>
 
@@ -111,7 +111,7 @@ export default function RightPanel() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask a question about this chapter..."
+            placeholder="Pose ta question sur ce chapitre..."
             disabled={loading}
             className="flex-1 bg-neutral-900 border border-neutral-800 p-2 rounded outline-none text-sm disabled:opacity-50"
           />
@@ -120,7 +120,7 @@ export default function RightPanel() {
             disabled={loading || !input.trim()}
             className="bg-neutral-800 border border-neutral-700 px-4 py-2 rounded text-sm hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Send
+            Envoyer
           </button>
         </div>
       </form>
