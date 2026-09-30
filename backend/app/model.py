@@ -5,10 +5,21 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, Uniq
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from pgvector.sqlalchemy import Vector
+from fastapi_users.db import SQLAlchemyBaseOAuthAccountTableUUID , SQLAlchemyBaseUserTableUUID
+from sqlalchemy.orm import Mapped ,relationship
+
 
 
 class Base(DeclarativeBase):
     pass
+
+class OauthAccount(SQLAlchemyBaseOAuthAccountTableUUID,Base):
+    pass 
+
+class User(SQLAlchemyBaseUserTableUUID,Base):
+    oauth_accounts: Mapped[list[OauthAccount]]=relationship(
+        "OauthAccount",lazy="joined"
+    )
 
 
 class Document(Base):

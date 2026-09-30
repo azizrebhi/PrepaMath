@@ -6,12 +6,26 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_async_session
 from app.model import ChapterPart, Document
-from app.schema import ChapterPartOut
+from app.schema import ChapterPartOut, DocumentOut
 
 router = APIRouter(
     prefix="/documents",
     tags=["chapters"],
 )
+
+
+@router.get("", response_model=list[DocumentOut])
+async def list_documents(session: AsyncSession = Depends(get_async_session)):
+    """All ingested chapters — the roadmap/landing-page navigation source.
+
+    Document ids change every re-ingestion (task.py assigns a fresh uuid4
+    each run), so the frontend must always discover the current id here
+    rather than hardcoding/bookmarking one.
+    """
+    documents = (
+        await session.execute(select(Document).order_by(Document.created_at))
+    ).scalars().all()
+    return documents
 
 
 @router.get("/{document_id}/parts", response_model=list[ChapterPartOut])

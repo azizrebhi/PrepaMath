@@ -1,7 +1,14 @@
 from pydantic import BaseModel ,Field
 from uuid import UUID
+from fastapi_users import schemas
 
 
+
+class UserRead(schemas.BaseUser[UUID]):
+    pass
+
+class UserCreate(schemas.BaseUserCreate):
+    pass
 
 class AskRequest(BaseModel):
     query: str
@@ -36,3 +43,9 @@ class ChapterPartOut(BaseModel):
     id: UUID
     title: str
     order_index: int
+
+
+class DocumentOut(BaseModel):
+    id: UUID
+    title: str
+    status: str
