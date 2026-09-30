@@ -8,9 +8,10 @@ from app.schema import (
     RetrieveResponse,
     RetrieveRequest,
 )
+from app.auth import current_active_user
 from app.database import get_async_session
 from app.services.retrieval_pipeline import run_pipeline
-
+from app.model import User
 open_ai_key = os.getenv("OPEN_AI_KEY")
 
 client = AsyncOpenAI(
@@ -27,6 +28,7 @@ router = APIRouter(
 async def create_session(
     payload: RetrieveRequest,
     session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(current_active_user)
 ):
     # Config picked from evaluation/metrics.py results on the benchmark
     # dataset: dense-only currently beats both hybrid (RRF-fusing a lexical

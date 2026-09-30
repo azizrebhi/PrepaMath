@@ -5,8 +5,9 @@ from openai import AsyncOpenAI
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth import current_active_user
 from app.database import get_async_session
-from app.model import DocumentParentChunk
+from app.model import DocumentParentChunk, User
 from app.schema import AskRequest, AskResponse, Source
 from app.services.retrieval_pipeline import run_pipeline
 
@@ -38,6 +39,7 @@ async def ask_question(
     document_id: str,
     payload: AskRequest,
     session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(current_active_user),
 ):
     # Retrieval only — same pipeline /retrieve uses, scoped to this document
     # so a question in one chapter can't surface an answer from another.

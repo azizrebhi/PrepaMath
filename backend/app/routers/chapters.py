@@ -3,9 +3,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.auth import current_active_user
 
 from app.database import get_async_session
-from app.model import ChapterPart, Document
+from app.model import ChapterPart, Document,User
 from app.schema import ChapterPartOut, DocumentOut
 
 router = APIRouter(
@@ -15,7 +16,8 @@ router = APIRouter(
 
 
 @router.get("", response_model=list[DocumentOut])
-async def list_documents(session: AsyncSession = Depends(get_async_session)):
+async def list_documents(session: AsyncSession = Depends(get_async_session),
+                         user: User = Depends(current_active_user)):
     """All ingested chapters — the roadmap/landing-page navigation source.
 
     Document ids change every re-ingestion (task.py assigns a fresh uuid4
@@ -32,6 +34,8 @@ async def list_documents(session: AsyncSession = Depends(get_async_session)):
 async def list_chapter_parts(
     document_id: UUID,
     session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(current_active_user)
+
 ):
     """Ordered sections of a chapter — the left-panel navigation source."""
     document_exists = (

@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from app.auth import fastapi_users ,auth_backend
+
+from app.auth import fastapi_users ,auth_backend, google_oauth_client, SECRET
 from app.schema import UserRead , UserCreate
 from app.routers import answer, chapters, retrieval
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Starting up...")
@@ -23,6 +25,15 @@ app.add_middleware(
 
 
 # Include your auth router
+app.include_router(fastapi_users.get_oauth_router(
+    google_oauth_client,
+    auth_backend,
+    SECRET,
+    associate_by_email=True,
+          ),
+          prefix="/auth/google",
+          tags=["auth"],
+)
 app.include_router(fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"])
 app.include_router(fastapi_users.get_register_router(UserRead, UserCreate), prefix="/auth", tags=["auth"])
 app.include_router(retrieval.router)

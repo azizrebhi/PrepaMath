@@ -3,31 +3,41 @@ import uuid
 from typing import Optional
 from fastapi import Depends , Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi_users.db import SQLAlchemyUserDatabase
 
+from httpx_oauth.clients.google import GoogleOAuth2
 from fastapi_users import BaseUserManager , FastAPIUsers , UUIDIDMixin
 from fastapi_users.authentication import AuthenticationBackend, BearerTransport, JWTStrategy
+
+from fastapi_users.db import SQLAlchemyUserDatabase
+
 from app.database import get_async_session
-from app.model import User
+from app.model import User ,OauthAccount
+
 SECRET= os.getenv("SECRET_KEY")
 
+google_oauth_client = GoogleOAuth2(
+    os.getenv("GOOGLE_CLIENT_ID"),
+    os.getenv("GOOGLE_CLIENT_SECRET")
+)
+
+
 async def get_user_db(session: AsyncSession=Depends(get_async_session)):
-    yield SQLAlchemyUserDatabase(session,User)
+    yield SQLAlchemyUserDatabase(session,User, OauthAccount)
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
-  reset_password_token_secret = SECRET
-  verification_token_secret = SECRET
+    reset_password_token_secret = SECRET
+    verification_token_secret = SECRET
 
 async def on_after_register(self, user: User, request: Optional[Request] = None):
-   print(f"User {user.id} has registered.")
+    print(f"User {user.id} has registered.")
 
 async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db)):
-  yield UserManager(user_db)
+    yield UserManager(user_db)
 
 bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
 def get_jwt_strategy() -> JWTStrategy:
-       return JWTStrategy(secret=SECRET, lifetime_seconds=3600)
+    return JWTStrategy(secret=SECRET, lifetime_seconds=3600)
 
 auth_backend = AuthenticationBackend(
         name="jwt",
