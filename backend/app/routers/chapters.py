@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth import current_active_user
 
 from app.database import get_async_session
-from app.model import ChapterPart, Document,User
-from app.schema import ChapterPartOut, DocumentOut
+from app.model import ChapterPart, Document, DocumentParentChunk, User
+from app.schema import ChapterPartOut, DocumentOut, ChapterPartOutContent, DocumentParentChunkOut
 
 router = APIRouter(
     prefix="/documents",
@@ -53,3 +53,38 @@ async def list_chapter_parts(
     ).scalars().all()
 
     return parts
+
+
+
+@router.get("/{document_id}/parts/{part_id}/chunks", response_model=ChapterPartOutContent)
+async def get_chapter_part_content(
+    document_id: UUID,
+    part_id: UUID,
+    session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(current_active_user),
+):
+    """A section's actual content — the chunks a student reads in the left panel."""
+    part = (
+        await session.execute(
+            select(ChapterPart).where(
+                ChapterPart.id == part_id,
+                ChapterPart.document_id == document_id,
+            )
+        )
+    ).scalar_one_or_none()
+    if part is None:
+        raise HTTPException(status_code=404, detail="Chapter part not found")
+
+    chunks = (
+        await session.execute(
+            select(DocumentParentChunk)
+            .where(DocumentParentChunk.part_id == part_id)
+            .order_by(DocumentParentChunk.parent_index)
+        )
+    ).scalars().all()
+
+    return ChapterPartOutContent(
+        id=part.id,
+        title=part.title,
+        chunks=[DocumentParentChunkOut.model_validate(c, from_attributes=True) for c in chunks],
+    )

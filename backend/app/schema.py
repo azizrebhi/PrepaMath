@@ -49,3 +49,16 @@ class DocumentOut(BaseModel):
     id: UUID
     title: str
     status: str
+
+class DocumentParentChunkOut(BaseModel):
+    id: UUID
+    parent_index: int
+    chunk_type: str | None
+    number: str | None
+    content: str
+
+
+class ChapterPartOutContent(BaseModel):
+    id: UUID
+    title: str
+    chunks: list[DocumentParentChunkOut]
