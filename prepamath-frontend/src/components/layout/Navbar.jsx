@@ -1,9 +1,13 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import kernelLogo from "../../assets/kernel.png";
+import { useAuth } from "../../context/AuthContext";
 
 const NAV_LINKS = [{ label: "Chapitres", to: "/chapters" }];
 
 export default function Navbar() {
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
   return (
     <nav className="flex-shrink-0 flex items-center justify-between h-14 px-6 border-b border-neutral-800">
       <div className="flex items-center gap-x-8">
@@ -28,10 +32,21 @@ export default function Navbar() {
       </div>
 
       <div className="flex items-center gap-x-4">
-        {/* No auth yet — visual placeholder only, not wired to anything */}
-        <button className="text-sm px-3 py-1.5 rounded-md border border-neutral-700 text-neutral-300 hover:border-neutral-500 hover:text-white transition-colors">
-          Connexion
-        </button>
+        {isAuthenticated ? (
+          <button
+            onClick={() => { logout(); navigate("/"); }}
+            className="text-sm px-3 py-1.5 rounded-md border border-neutral-700 text-neutral-300 hover:border-neutral-500 hover:text-white transition-colors"
+          >
+            Déconnexion
+          </button>
+        ) : (
+          <Link
+            to="/login"
+            className="text-sm px-3 py-1.5 rounded-md border border-neutral-700 text-neutral-300 hover:border-neutral-500 hover:text-white transition-colors"
+          >
+            Connexion
+          </Link>
+        )}
       </div>
     </nav>
   );

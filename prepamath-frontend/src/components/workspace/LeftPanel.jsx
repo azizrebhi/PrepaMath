@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -8,13 +9,16 @@ export default function LeftPanel() {
   const [parts, setParts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { token } = useAuth();
 
   useEffect(() => {
     async function fetchParts() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE_URL}/documents/${chapterId}/parts`);
+        const res = await fetch(`${API_BASE_URL}/documents/${chapterId}/parts`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (!res.ok) {
           throw new Error(`Échec de la requête : ${res.status}`);
         }
@@ -28,7 +32,7 @@ export default function LeftPanel() {
     }
 
     fetchParts();
-  }, [chapterId]);
+  }, [chapterId, token]);
 
   if (loading) {
     return <p className="p-6 text-neutral-100">Chargement...</p>;

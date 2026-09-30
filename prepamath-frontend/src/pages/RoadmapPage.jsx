@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -12,13 +13,16 @@ export default function RoadmapPage() {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { token } = useAuth();
 
   useEffect(() => {
     async function fetchDocuments() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE_URL}/documents`);
+        const res = await fetch(`${API_BASE_URL}/documents`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (!res.ok) {
           throw new Error(`Échec de la requête : ${res.status}`);
         }
@@ -32,7 +36,7 @@ export default function RoadmapPage() {
     }
 
     fetchDocuments();
-  }, []);
+  }, [token]);
 
   return (
     <div className="p-8 max-w-2xl mx-auto text-neutral-100">
