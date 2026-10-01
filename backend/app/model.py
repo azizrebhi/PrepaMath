@@ -146,3 +146,42 @@ class ChapterPart(Base):
     __table_args__ = (
         UniqueConstraint("document_id", "order_index", name="uq_chapter_part_order"),
     )
+
+class Conversation(Base):
+    __tablename__ = "conversation"
+    id: Mapped[uuid.UUID]=mapped_column(
+        UUID(as_uuid=True),primary_key=True,default=uuid.uuid4
+    )
+    document_id:Mapped[uuid.UUID]= mapped_column(
+        UUID(as_uuid=True),ForeignKey("documents.id"),nullable=False, index=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True) , ForeignKey("user.id"),nullable=False , index=True
+    )
+    created_at:Mapped[datetime]=mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+
+class Message(Base):
+    """One turn in a Conversation - both the student's question and the
+    tutor's answer get their own row, in order."""
+
+    __tablename__ = "message"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+    UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+
+    conversation_id: Mapped[uuid.UUID] = mapped_column(
+UUID(as_uuid=True), ForeignKey("conversation.id"), nullable=False, index=True )
+
+    role: Mapped[str] = mapped_column(String(20), nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+    
