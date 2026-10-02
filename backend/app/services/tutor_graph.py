@@ -1,11 +1,13 @@
 import json
 from typing import TypedDict, Annotated
 import operator
+from fastapi import  Depends
 
 from openai import AsyncOpenAI
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from langgraph.graph import StateGraph, START, END
+from app.database import get_async_session
 
 from app.model import DocumentParentChunk
 from app.services.retrieval_pipeline import run_pipeline
@@ -33,7 +35,7 @@ class TutorState(TypedDict):
     history: Annotated[list, operator.add]
 
 
-def build_tutor_graph(session: AsyncSession, client: AsyncOpenAI):
+def build_tutor_graph(session: AsyncSession ,client: AsyncOpenAI):
     """Compiles a fresh tutor graph bound to this request's session/client.
 
     Nodes are defined inside this factory (closures over `session`/`client`)

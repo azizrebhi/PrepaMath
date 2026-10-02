@@ -12,6 +12,8 @@ class UserCreate(schemas.BaseUserCreate):
 
 class AskRequest(BaseModel):
     query: str
+    current_part_id: UUID
+    conversation_id: UUID | None = None
 
 
 class Source(BaseModel):
@@ -22,7 +24,8 @@ class Source(BaseModel):
 
 class AskResponse(BaseModel):
     answer: str
-    sources: list[Source]
+    conversation_id: UUID
+    sources: list[Source] = []
 
 class RetrieveRequest(BaseModel):
     query: str = Field(min_length=2)
