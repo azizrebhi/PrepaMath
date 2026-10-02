@@ -60,11 +60,14 @@ def build_tutor_graph(session: AsyncSession ,client: AsyncOpenAI):
 
     async def classify_node(state: TutorState) -> dict:
         prompt = (
-            f"Contenu de la section actuelle :\n{state['section_content']}\n\n"
+            "Tu dois juger UNIQUEMENT si le texte ci-dessous aborde explicitement "
+            "le sujet de la question — ignore tout ce que tu sais par ailleurs sur "
+            "le sujet, même si tu serais capable d'y répondre toi-même. Si le "
+            "texte ne traite pas explicitement de ce sujet précis, réponds "
+            "'corpus', même si la question te semble simple.\n\n"
+            f"Texte de la section actuelle :\n{state['section_content']}\n\n"
             f"Question de l'étudiant : {state['question']}\n\n"
-            "Cette question peut-elle être répondue uniquement à partir du "
-            "contenu ci-dessus, ou nécessite-t-elle une recherche plus large "
-            "dans tout le cours ?"
+            "Ce texte aborde-t-il explicitement le sujet de cette question ?"
         )
         completion = await client.chat.completions.create(
             model=ANSWER_MODEL,
@@ -139,3 +142,4 @@ def build_tutor_graph(session: AsyncSession ,client: AsyncOpenAI):
     graph.add_edge("generate_node", END)
 
     return graph.compile()
+
