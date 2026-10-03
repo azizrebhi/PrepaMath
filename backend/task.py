@@ -222,12 +222,27 @@ _SECTION_LINE_PATTERN = re.compile(
     re.MULTILINE,
 )
 
+# A Roman-numeral section ("I Généralités") sometimes nests numbered
+# subsections ("## 1 Définition", "## 2 Rappels...") that the official course
+# syllabus treats as peer topics in their own right, not sub-points of one
+# giant section — e.g. "Réduction des endomorphismes"'s syllabus lists
+# "Polynôme caractéristique" and "Éléments propres" as separate topics, even
+# though this textbook nests both under one "II Éléments propres" heading.
+# Detecting these too gives ChapterPart granularity that actually matches
+# the syllabus instead of being stuck at the coarser Roman-numeral level.
+_SUBSECTION_LINE_PATTERN = re.compile(
+    r"^#{1,3}\s*\*{0,3}\s*(\d+)\s+([A-ZÀ-Ý].*?)\**\s*$",
+    re.MULTILINE,
+)
+
 
 def find_sections(markdown_text: str) -> list[tuple[int, str]]:
-    """Returns [(start_pos, title), ...] for each chapter section, in
-    document order, deduplicated as described above."""
+    """Returns [(start_pos, title), ...] for every navigable part, in
+    document order: Roman-numeral chapter sections, plus any numbered
+    subsections nested inside them, flattened into one list. Not every
+    Roman section has subsections — those stay a single part."""
 
-    sections: list[tuple[int, str]] = []
+    roman_sections: list[tuple[int, str]] = []
     next_expected = 0
 
     for m in _SECTION_LINE_PATTERN.finditer(markdown_text):
@@ -236,10 +251,28 @@ def find_sections(markdown_text: str) -> list[tuple[int, str]]:
         if m.group(1) != _ROMAN_SEQUENCE[next_expected]:
             continue
         title = m.group(2).replace("*", "").strip()
-        sections.append((m.start(), title))
+        roman_sections.append((m.start(), title))
         next_expected += 1
 
-    return sections
+    if not roman_sections:
+        return []
+
+    roman_starts = [start for start, _title in roman_sections]
+    subsections: list[tuple[int, str]] = []
+    next_sub_by_span: dict[int, int] = {}
+
+    for m in _SUBSECTION_LINE_PATTERN.finditer(markdown_text):
+        span_idx = bisect.bisect_right(roman_starts, m.start()) - 1
+        if span_idx < 0:
+            continue  # before any Roman section — not a real subsection
+        expected = next_sub_by_span.get(span_idx, 1)
+        if int(m.group(1)) != expected:
+            continue  # out-of-sequence match — running-header noise
+        title = m.group(2).replace("*", "").strip()
+        subsections.append((m.start(), title))
+        next_sub_by_span[span_idx] = expected + 1
+
+    return sorted(roman_sections + subsections, key=lambda item: item[0])
 
 
 def section_index_for_position(position: int, section_starts: list[int]) -> int | None:
@@ -414,6 +447,15 @@ def chunk_by_structure(
     for i, (start, heading_end, chunk_type, number) in enumerate(matches):
         end = matches[i + 1][0] if i + 1 < len(matches) else len(markdown_text)
 
+        # A chapter-section divider ("# II Éléments propres" + its subsection
+        # title) between this heading and the next isn't itself a
+        # HEADING_PATTERN match, so without this clip its text — and
+        # everything up to the next real heading — silently bleeds into this
+        # chunk's trailing content instead of being dropped as noise.
+        next_section_idx = bisect.bisect_right(section_starts, start)
+        if next_section_idx < len(section_starts) and section_starts[next_section_idx] < end:
+            end = section_starts[next_section_idx]
+
         block = markdown_text[start:end].strip()
         body_after_heading = markdown_text[heading_end:end].strip()
 
@@ -534,19 +576,27 @@ async def ingest_markdown_file(markdown_path: str, title: str):
         session.add(document)
         await session.flush()
 
+        # A Roman-numeral section whose content is immediately superseded by
+        # its own first numbered subsection (see find_sections) ends up with
+        # no units assigned to it at all — skip creating a ChapterPart for
+        # those rather than leaving an empty, unclickable entry in the nav.
+        used_indices = sorted({u["part_index"] for u in units if u["part_index"] is not None})
+
         chapter_parts = [
             ChapterPart(
                 id=uuid.uuid4(),
                 document_id=document.id,
-                title=section_title,
-                order_index=idx,
+                title=sections[section_idx][1],
+                order_index=order_idx,
             )
-            for idx, (_pos, section_title) in enumerate(sections)
+            for order_idx, section_idx in enumerate(used_indices)
         ]
         if chapter_parts:
             session.add_all(chapter_parts)
             await session.flush()
-        part_id_by_index = {idx: part.id for idx, part in enumerate(chapter_parts)}
+        part_id_by_index = {
+            section_idx: part.id for section_idx, part in zip(used_indices, chapter_parts)
+        }
 
         print("Generating contextual summaries (one LLM call per unit)...")
         context_summaries = []

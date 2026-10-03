@@ -1,0 +1,10 @@
+6912: num='1' title="Définition des éléments propres d'un endomorphisme"
+14632: num='2' title='Rappels sur les matrices semblables'
+17119: num='3' title="Éléments propres d'une matrice carrée"
+23424: num='4' title='Polynômes annulateurs'
+29979: num='5' title='Polynôme caractéristique'
+67607: num='1' title='Polynôme minimal'
+71197: num='2' title='Théorème de Cayley-Hamilton'
+73819: num='3' title='Lemme de décomposition des noyaux'
+82166: num='4' title='Polynômes annulateurs et diagonalisabilité'
+84514: num='5' title='Endomorphismes nilpotents, matrices nilpotentes'

@@ -1,0 +1,5 @@
+321: 'Sous-espaces stables et endomorphismes induits'
+6890: 'Éléments propres'
+48111: 'Endomorphismes et matrices diagonalisables'
+60165: 'Endomorphismes et matrices trigonalisables'
+67564: 'Utilisations des polynômes annulateurs'

@@ -1,0 +1,20 @@
+=== Chapitre 2 : Réduction des endomorphismes (69bcf8d2-8c81-4325-b3f9-4109191599e2) created=2026-09-29 19:03:39.053767+00:00 ===
+  order=0 title='Sous-espaces stables et endomorphismes induits' chunks=12
+  order=1 title='Éléments propres' chunks=84
+  order=2 title='Endomorphismes et matrices diagonalisables' chunks=23
+  order=3 title='Endomorphismes et matrices trigonalisables' chunks=15
+  order=4 title='Utilisations des polynômes annulateurs' chunks=84
+  (no part_id / front-matter): 1
+=== Chapitre 4 : Espaces vectoriels normés (99563cb9-2e46-4cb7-b7bd-08ca949a0332) created=2026-09-29 19:08:13.419168+00:00 ===
+  order=0 title='Généralités' chunks=45
+  order=1 title="Suites d'éléments d'un espace vectoriel normé" chunks=21
+  order=2 title="Topologie d'un espace vectoriel normé" chunks=48
+  order=3 title='Comparaison de normes' chunks=62
+  (no part_id / front-matter): 1
+=== Chapitre 2 : Réduction des endomorphismes (86a289d9-1967-46fd-bf95-b5b7d5a38563) created=2026-10-02 13:00:37.677944+00:00 ===
+  order=0 title='Sous-espaces stables et endomorphismes induits' chunks=12
+  order=1 title='Éléments propres' chunks=84
+  order=2 title='Endomorphismes et matrices diagonalisables' chunks=23
+  order=3 title='Endomorphismes et matrices trigonalisables' chunks=15
+  order=4 title='Utilisations des polynômes annulateurs' chunks=84
+  (no part_id / front-matter): 1

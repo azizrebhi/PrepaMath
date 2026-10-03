@@ -1,0 +1,69 @@
+warning: `VIRTUAL_ENV=C:\Users\maison info\Desktop\MATH\.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+2026-10-02 19:44:27,234 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2026-10-02 19:44:27,234 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-10-02 19:44:27,243 INFO sqlalchemy.engine.Engine select current_schema()
+2026-10-02 19:44:27,243 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-10-02 19:44:27,251 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2026-10-02 19:44:27,251 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-10-02 19:44:27,251 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-10-02 19:44:27,251 INFO sqlalchemy.engine.Engine SELECT documents.id, documents.title, documents.file_path, documents.status, documents.parsed_markdown, documents.created_at 
+FROM documents 
+WHERE documents.id = $1::UUID
+2026-10-02 19:44:27,251 INFO sqlalchemy.engine.Engine [generated in 0.00065s] ('ed62ca38-0eaf-4636-b5f4-a667c61ba3de',)
+2026-10-02 19:44:27,266 INFO sqlalchemy.engine.Engine SELECT chapter_part.id, chapter_part.document_id, chapter_part.title, chapter_part.order_index 
+FROM chapter_part 
+WHERE chapter_part.document_id = $1::UUID ORDER BY chapter_part.order_index
+2026-10-02 19:44:27,271 INFO sqlalchemy.engine.Engine [generated in 0.00021s] ('ed62ca38-0eaf-4636-b5f4-a667c61ba3de',)
+2026-10-02 19:44:27,271 INFO sqlalchemy.engine.Engine SELECT count(*) AS count_1 
+FROM document_parent_chunk 
+WHERE document_parent_chunk.part_id = $1::UUID
+2026-10-02 19:44:27,271 INFO sqlalchemy.engine.Engine [generated in 0.00020s] (UUID('c7eb8a8d-fd80-49b9-8b25-84a32de34386'),)
+2026-10-02 19:44:27,271 INFO sqlalchemy.engine.Engine SELECT count(*) AS count_1 
+FROM document_parent_chunk 
+WHERE document_parent_chunk.part_id = $1::UUID
+2026-10-02 19:44:27,271 INFO sqlalchemy.engine.Engine [cached since 0.005494s ago] (UUID('a1d8f0f1-eee0-4262-b4a5-edd2d2e38cc1'),)
+2026-10-02 19:44:27,282 INFO sqlalchemy.engine.Engine SELECT count(*) AS count_1 
+FROM document_parent_chunk 
+WHERE document_parent_chunk.part_id = $1::UUID
+2026-10-02 19:44:27,282 INFO sqlalchemy.engine.Engine [cached since 0.007872s ago] (UUID('37b02c01-5d6b-48e7-9b7b-54a9f58586a4'),)
+2026-10-02 19:44:27,284 INFO sqlalchemy.engine.Engine SELECT count(*) AS count_1 
+FROM document_parent_chunk 
+WHERE document_parent_chunk.part_id = $1::UUID
+2026-10-02 19:44:27,284 INFO sqlalchemy.engine.Engine [cached since 0.01013s ago] (UUID('6bf34c49-7950-4632-81e9-e8818b91c83f'),)
+2026-10-02 19:44:27,284 INFO sqlalchemy.engine.Engine SELECT count(*) AS count_1 
+FROM document_parent_chunk 
+WHERE document_parent_chunk.part_id = $1::UUID
+2026-10-02 19:44:27,284 INFO sqlalchemy.engine.Engine [cached since 0.01212s ago] (UUID('ab400053-4bae-42ea-afc7-cc21a681d91d'),)
+2026-10-02 19:44:27,284 INFO sqlalchemy.engine.Engine SELECT document_parent_chunk.id, document_parent_chunk.document_id, document_parent_chunk.parent_index, document_parent_chunk.part_id, document_parent_chunk.chunk_type, document_parent_chunk.number, document_parent_chunk.content, document_parent_chunk.token_count, document_parent_chunk.page_start, document_parent_chunk.page_end 
+FROM document_parent_chunk 
+WHERE document_parent_chunk.document_id = $1::UUID
+2026-10-02 19:44:27,284 INFO sqlalchemy.engine.Engine [generated in 0.00018s] ('ed62ca38-0eaf-4636-b5f4-a667c61ba3de',)
+2026-10-02 19:44:27,284 INFO sqlalchemy.engine.Engine SELECT documents.id, documents.title, documents.file_path, documents.status, documents.parsed_markdown, documents.created_at 
+FROM documents 
+WHERE documents.id = $1::UUID
+2026-10-02 19:44:27,284 INFO sqlalchemy.engine.Engine [cached since 0.03444s ago] ('323cec78-a770-40eb-9ed4-ac825a137e0e',)
+2026-10-02 19:44:27,298 INFO sqlalchemy.engine.Engine SELECT chapter_part.id, chapter_part.document_id, chapter_part.title, chapter_part.order_index 
+FROM chapter_part 
+WHERE chapter_part.document_id = $1::UUID ORDER BY chapter_part.order_index
+2026-10-02 19:44:27,298 INFO sqlalchemy.engine.Engine [cached since 0.03375s ago] ('323cec78-a770-40eb-9ed4-ac825a137e0e',)
+2026-10-02 19:44:27,298 INFO sqlalchemy.engine.Engine SELECT count(*) AS count_1 
+FROM document_parent_chunk 
+WHERE document_parent_chunk.part_id = $1::UUID
+2026-10-02 19:44:27,298 INFO sqlalchemy.engine.Engine [cached since 0.03233s ago] (UUID('3d477d01-f13a-4007-8a16-39d450c01cc4'),)
+2026-10-02 19:44:27,298 INFO sqlalchemy.engine.Engine SELECT count(*) AS count_1 
+FROM document_parent_chunk 
+WHERE document_parent_chunk.part_id = $1::UUID
+2026-10-02 19:44:27,298 INFO sqlalchemy.engine.Engine [cached since 0.03381s ago] (UUID('82ade60b-83f7-43ee-916e-8b58152aad2e'),)
+2026-10-02 19:44:27,298 INFO sqlalchemy.engine.Engine SELECT count(*) AS count_1 
+FROM document_parent_chunk 
+WHERE document_parent_chunk.part_id = $1::UUID
+2026-10-02 19:44:27,298 INFO sqlalchemy.engine.Engine [cached since 0.03523s ago] (UUID('3c06fd7a-52d8-4087-800e-e9b2b430d5d5'),)
+2026-10-02 19:44:27,298 INFO sqlalchemy.engine.Engine SELECT count(*) AS count_1 
+FROM document_parent_chunk 
+WHERE document_parent_chunk.part_id = $1::UUID
+2026-10-02 19:44:27,312 INFO sqlalchemy.engine.Engine [cached since 0.03671s ago] (UUID('7f28475f-1f9a-4aa9-aa36-047cf1c94a9b'),)
+2026-10-02 19:44:27,313 INFO sqlalchemy.engine.Engine SELECT document_parent_chunk.id, document_parent_chunk.document_id, document_parent_chunk.parent_index, document_parent_chunk.part_id, document_parent_chunk.chunk_type, document_parent_chunk.number, document_parent_chunk.content, document_parent_chunk.token_count, document_parent_chunk.page_start, document_parent_chunk.page_end 
+FROM document_parent_chunk 
+WHERE document_parent_chunk.document_id = $1::UUID
+2026-10-02 19:44:27,313 INFO sqlalchemy.engine.Engine [cached since 0.02401s ago] ('323cec78-a770-40eb-9ed4-ac825a137e0e',)
+2026-10-02 19:44:27,313 INFO sqlalchemy.engine.Engine ROLLBACK

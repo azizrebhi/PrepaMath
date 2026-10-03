@@ -4,12 +4,12 @@ import RightPanel from "./RightPanel";
 
 const MIN_LEFT_PERCENT = 20;
 const MAX_LEFT_PERCENT = 70;
-const PANEL_COLOR = "#262527";
 
 export default function SplitPanel() {
   const containerRef = useRef(null);
   const [leftWidth, setLeftWidth] = useState(40); // percent
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedPartId, setSelectedPartId] = useState(null);
 
   const handleMouseDown = useCallback((e) => {
     e.preventDefault(); // stops text-selection while dragging
@@ -42,27 +42,24 @@ export default function SplitPanel() {
   return (
     <div
       ref={containerRef}
-      className={`flex h-full gap-1 p-2 ${isDragging ? "select-none" : ""}`}
+      className={`flex h-full gap-1 p-2 bg-canvas ${isDragging ? "select-none" : ""}`}
     >
       <div
-        style={{ width: `${leftWidth}%`, backgroundColor: PANEL_COLOR }}
-        className="rounded-lg overflow-y-auto"
+        style={{ width: `${leftWidth}%` }}
+        className="bg-surface border border-border-subtle rounded-lg overflow-y-auto"
       >
-        <LeftPanel />
+        <LeftPanel selectedPartId={selectedPartId} setSelectedPartId={setSelectedPartId} />
       </div>
 
       <div
         onMouseDown={handleMouseDown}
         className="w-3 flex-shrink-0 flex items-center justify-center cursor-col-resize group"
       >
-        <div className="h-10 w-1 rounded-full bg-neutral-700 group-hover:bg-neutral-500 transition-colors" />
+        <div className="h-10 w-1 rounded-full bg-border-subtle group-hover:bg-ink-muted transition-colors" />
       </div>
 
-      <div
-        style={{ backgroundColor: PANEL_COLOR }}
-        className="flex-1 rounded-lg overflow-hidden"
-      >
-        <RightPanel />
+      <div className="flex-1 bg-surface border border-border-subtle rounded-lg overflow-hidden">
+        <RightPanel selectedPartId={selectedPartId} />
       </div>
     </div>
   );

@@ -1,0 +1,13 @@
+count=12
+1: Définition 1 -- '### **Définition 1**\n> Un sous-espace vectoriel $F$ de $E$ e'
+2: Exemple None -- '### Exemples\n1. Les sous-espaces vectoriels $\\{0\\}$ et $E$ s'
+3: Exercice 1 -- 'p.107 **Exercice 1**\n\n1. On suppose que pour tout $x \\in E$,'
+4: Exercice 2 -- 'p.107 **Exercice 2** Soit $D$ la dérivation de $\\mathbb{K}[X'
+5: Proposition 1 -- '**Proposition 1**\nSi les endomorphismes $u$ et $v$ commutent'
+6: Proposition 2 -- '**Proposition 2**\nSi $F$ est un sous-espace vectoriel de $E$'
+7: Exemple None -- '**Exemples**\n1. Soit $x$ un vecteur non nul de $E$. La droit'
+8: Définition 2 -- '**Définition 2**\nSoit $F$ un sous-espace vectoriel stable pa'
+9: Remarque None -- "**Remarque** L'image de $u_F$ est égale à $u(F)$ et son noya"
+10: Corollaire 3 -- '## Corollaire 3 (**Traduction matricielle de la stabilité**)'
+11: Remarque None -- '## Remarques\n\n- Une matrice de la forme $\\begin{pmatrix} A &'
+12: Proposition 4 -- '**Proposition 4**\nSoit $\\mathcal{B} = (\\mathcal{B}_1, \\dots,'

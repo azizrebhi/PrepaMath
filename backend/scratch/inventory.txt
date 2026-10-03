@@ -1,0 +1,400 @@
+=== reduction (ed62ca38-0eaf-4636-b5f4-a667c61ba3de) ===
+[0] Introduction: # Chapitre 2 : Réduction des endomorphismes
+[1] Définition 1: ### **Définition 1**
+[2] Exemple: ### Exemples
+[3] Exercice 1: p.107 **Exercice 1**
+[4] Exercice 2: p.107 **Exercice 2** Soit $D$ la dérivation de $\mathbb{K}[X]$.
+[5] Proposition 1: **Proposition 1**
+[6] Proposition 2: **Proposition 2**
+[7] Exemple: **Exemples**
+[8] Définition 2: **Définition 2**
+[9] Remarque: **Remarque** L'image de $u_F$ est égale à $u(F)$ et son noyau à $F \cap Ker  u$.
+[10] Corollaire 3: ## Corollaire 3 (**Traduction matricielle de la stabilité**)
+[11] Remarque: ## Remarques
+[12] Proposition 4: **Proposition 4**
+[13] Définition 3: **Définition 3**
+[14] Remarque: **Remarque** Si un vecteur $x$ non nul vérifie $\lambda x = \mu x$, alors $\lambda = \mu$ 
+[15] Définition 4: **Définition 4**
+[16] Remarque: **Remarques**
+[17] Point méthode: ## **Point méthode**
+[18] Exemple: ## Exemples
+[19] Exercice 5: p.109 **Exercice 5** Soit $E = \mathcal{C}^\infty(\mathbb{R}, \mathbb{R})$ et $D \in \math
+[20] Exercice 6: p.109 **Exercice 6** Soit $E = \mathbb{C}^{\mathbb{N}}$, l’espace des suites complexes.
+[21] Exercice 7: p.109 **Exercice 7** Soit $E = \mathbb{C}[X]$ et $u \in \mathcal{L}(E)$ défini par $u(P) =
+[22] Exercice 8: p.109 **Exercice 8** Soit $\varphi$ un isomorphisme de $E$ dans $F$ et $u$ un endomorphism
+[23] Proposition 5: ## **Proposition 5**
+[24] Proposition 6: ## **Proposition 6**
+[25] Exemple: ## **Exemples**
+[26] Exercice 9: p.110 **Exercice 9** Soit $E = \mathcal{C}^\infty (\mathbb{R}_+^*, \mathbb{R})$ et $u \in 
+[27] Corollaire 7: **Corollaire 7**
+[28] Corollaire 8: **Corollaire 8**
+[29] Proposition 9: **Proposition 9**
+[30] Proposition 10: **Proposition 10**
+[31] Définition 5: ## **Définition 5**
+[32] Proposition 11: ## **Proposition 11**
+[33] Proposition 12: ## **Proposition 12**
+[34] Remarque: ## Remarques
+[35] Définition 6: **Définition 6**
+[36] Remarque: **Remarque** Le scalaire $\lambda$ est valeur propre de $A \in \mathcal{M}_n(\mathbb{K})$ 
+[37] Exercice 11: p.111 **Exercice 11**
+[38] Remarque: **Remarque** En sciences industrielles, on utilise des matrices d'inductance qui relient f
+[39] Remarque: **Remarque** Les éléments propres d’une matrice $A$ sont ceux de l’endomorphisme de $\math
+[40] Proposition 13: ### **Proposition 13**
+[41] Corollaire 14: ### **Corollaire 14**
+[42] Remarque: **Remarque** Plus précisément, si $A = P^{-1}BP$, alors pour tout $\lambda \in \text{sp}(A
+[43] Exemple: **Exemple** La matrice $A = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}$ n'a pas de vale
+[44] Proposition 15: ### **Proposition 15**
+[45] Proposition 16: ### **Proposition 16**
+[46] Remarque: ### **Remarque**
+[47] Définition 7: **Définition 7**
+[48] Proposition 17: ## **Proposition 17**
+[49] Proposition 18: ## **Proposition 18**
+[50] Corollaire 19: ## **Corollaire 19**
+[51] Définition 8: ## **Définition 8**
+[52] Exemple: ## **Exemples**
+[53] Proposition 20: ## **Proposition 20**
+[54] Exemple: ### **Exemple**
+[55] Corollaire 21: ### **Corollaire 21**
+[56] Corollaire 22: ### **Corollaire 22**
+[57] Corollaire 23: ### **Corollaire 23**
+[58] Exemple: **Exemple** Si $u$ vérifie $u^4 + u + \text{Id} = 0$, alors $u$ est inversible. Plus préci
+[59] Point méthode: ### **Point méthode**
+[60] Exercice 12: **Exercice 12** Soit $A = \begin{pmatrix} 1 & 2 & -1 \\ -4 & 10 & -4 \\ -8 & 16 & -6 \end{
+[61] Définition 9: **Définition 9**
+[62] Remarque: **Remarques**
+[63] Théorème 24: **Théorème 24**
+[64] Proposition 25: ## **Proposition 25**
+[65] Point méthode: ### **Point méthode**
+[66] Exemple: **Exemple** Soit $A = \begin{pmatrix} 3 & 5 & -6 \\ 4 & 7 & -9 \\ 3 & 6 & -7 \end{pmatrix}
+[67] Exercice 13: p.112 **Exercice 13** Soit $\theta \in \mathbb{R}$ et $A = \begin{pmatrix} 1 & 0 & 0 \\ 0 
+[68] Remarque: **Remarque** Si $A \in \mathcal{M}_n(\mathbb{C})$, alors $\chi_{\overline{A}} = \overline{
+[69] Exercice 14: p.112 **Exercice 14** Soit $A \in \mathcal{M}_n(\mathbb{K})$. Montrer que $A$ et $^tA$ ont
+[70] Corollaire 26: ## **Corollaire 26**
+[71] Proposition 27: ## **Proposition 27**
+[72] Remarque: **Remarque** On retrouve le fait qu'une matrice carrée de taille $n$ a au plus $n$ valeurs
+[73] Exemple: ## **Exemples**
+[74] Exercice 15: p.113 **Exercice 15** Soit $A \in \mathcal{M}_n(\mathbb{K})$. Calculer le polynôme caracté
+[75] Exercice 16: p.113 **Exercice 16** Soit $A$ et $B$ deux matrices de $\mathcal{M}_n(\mathbb{C})$.
+[76] Exercice 17: p.113 **Exercice 17 Polynôme caractéristique d’une matrice compagnon**
+[77] Remarque: ## Remarques
+[78] Lemme 28: ### **Lemme 28**
+[79] Définition 10: ## **Définition 10**
+[80] Remarque: ### Remarques
+[81] Proposition 29: ## **Proposition 29**
+[82] Théorème 30: ## **Théorème 30**
+[83] Remarque: **Remarque** On retrouve le fait qu’un endomorphisme d’un espace vectoriel de dimension $n
+[84] Corollaire 31: ## **Corollaire 31**
+[85] Proposition 32: ### **Proposition 32**
+[86] Remarque: ### Remarques
+[87] Proposition 33: ### **Proposition 33**
+[88] Définition 11: ### **Définition 11**
+[89] Remarque: **Remarque** En particulier, une valeur propre de $u$ est dite simple, double, triple, ...
+[90] Remarque: **Remarque** D'après la remarque de la page 74, la multiplicité d'une valeur propre réelle
+[91] Proposition 34: ## **Proposition 34**
+[92] Exemple: ### Exemples
+[93] Corollaire 35: ### **Corollaire 35**
+[94] Remarque: **Remarque** Le spectre de $u$ est, par définition, l'ensemble des racines de $\chi_u$ dan
+[95] Proposition 36: ## **Proposition 36**
+[96] Exemple: ### Exemples
+[97] Définition 12: ## **Définition 12**
+[98] Proposition 37: ## **Proposition 37**
+[99] Remarque: ### Remarques
+[100] Proposition 38: ## Proposition 38
+[101] Remarque: **Remarque** On verra plus tard qu'il y a plus rapide. En effet, d'après le théorème 60 de
+[102] Proposition 39: ## Proposition 39
+[103] Corollaire 40: ## Corollaire 40
+[104] Remarque: **Remarque** Soit $A \in \mathcal{M}_n(\mathbb{K})$ diagonalisable et $P \in \mathcal{GL}_
+[105] Point méthode: ### **Point méthode**
+[106] Exercice 21: **Exercice 21** La matrice $A = \begin{pmatrix} 0 & 3 & 2 \\ -2 & 5 & 2 \\ 2 & -3 & 0 \end
+[107] Proposition 41: ### **Proposition 41**
+[108] Corollaire 42: ### **Corollaire 42**
+[109] Exemple: ### **Exemples**
+[110] Remarque: ## Remarques
+[111] Exemple: **Exemple** Soit la matrice complexe :
+[112] Corollaire 43: ## **Corollaire 43**
+[113] Théorème 44: ## **Théorème 44**
+[114] Remarque: ### Remarque
+[115] Corollaire 45: ### **Corollaire 45**
+[116] Point méthode: ### **Point méthode**
+[117] Exercice 23: **Exercice 23** Soit $A = \begin{pmatrix} 1 & a & b \\ 0 & 1 & c \\ 0 & 0 & -1 \end{pmatri
+[118] Remarque: ### Remarque
+[119] Exemple: ### Exemple
+[120] Définition 13: ### **Définition 13**
+[121] Remarque: **Remarque** Soit $\mathcal{B} = (e_1, \dots, e_n)$ une base de $E$. La matrice de $u$ dan
+[122] Proposition 46: ## Proposition 46
+[123] Corollaire 47: ## Corollaire 47
+[124] Remarque: **Remarque** On aurait pu aussi choisir la forme triangulaire inférieure. En effet, il est
+[125] Théorème 48: ## Théorème 48
+[126] Corollaire 49: ## Corollaire 49
+[127] Corollaire 50: ## Corollaire 50
+[128] Remarque: ## **Remarque**
+[129] Exemple: ## **Exemples**
+[130] Exercice 28: p.120 **Exercice 28**
+[131] Corollaire 51: **Corollaire 51**
+[132] Remarque: **Remarque** Recherche de la valeur propre de plus grand module.
+[133] Exercice 29: p.121
+[134] Remarque: **Remarque** En fait, pour tout endomorphisme $u$, on a $\chi_u(u) = 0$.
+[135] Proposition 52: **Proposition 52**
+[136] Corollaire 53: **Corollaire 53**
+[137] Remarque: **Remarque** Comme le montre l’exercice suivant, il peut arriver, en dimension infinie, qu
+[138] Exercice 30: p.122
+[139] Proposition 54: **Proposition 54**
+[140] Remarque: **Remarque** D’après le théorème 21 de la page 16, si $\mathcal{I}$ est un idéal de $\math
+[141] Définition 14: ### Définition 14
+[142] Remarque: ### Remarques
+[143] Exercice 31: p.122 ### **Exercice 31**
+[144] Exercice 32: p.123 ### **Exercice 32** Montrer que l’ensemble des racines du polynôme minimal $\pi_u$ e
+[145] Proposition 55: ### **Proposition 55**
+[146] Point méthode: ### **Point méthode**
+[147] Exercice 33: p.123
+[148] Remarque: **Remarque** Combiné avec l’exercice 17 de la page 81, ce résultat prouve que si $A$ est u
+[149] Théorème 56: ### **Théorème 56 (Théorème de Cayley-Hamilton)**
+[150] Corollaire 57: ### **Corollaire 57 (Théorème de Cayley-Hamilton)**
+[151] Théorème 58: ### **Théorème 58 (Lemme de décomposition des noyaux)**
+[152] Corollaire 59: ## **Corollaire 59**
+[153] Remarque: ### Remarque
+[154] Exercice 36: p.125 **Exercice 36** Soit $(P_1, \dots, P_r) \in \mathbb{K}[X]^r$ une famille de polynôme
+[155] Exemple part1: ### Exemples
+[156] Exemple part2: Soit l’équation récurrente linéaire à coefficients constants d’ordre $p$ :
+[157] Théorème 60: ### **Théorème 60**
+[158] Remarque: **Remarque** L’exercice 29 de la page 96 permet d’énoncer un résultat similaire pour les e
+[159] Corollaire 61: ### **Corollaire 61**
+[160] Remarque: **Remarque** En adaptant cet exercice et en utilisant l'exercice 25 de la page 93, on obti
+[161] Définition 15: ### **Définition 15**
+[162] Remarque: ### **Remarques**
+[163] Définition 16: ### **Définition 16**
+[164] Remarque: ## Remarques
+[165] Proposition 62: ### **Proposition 62**
+[166] Corollaire 63: ### **Corollaire 63**
+[167] Corollaire 64: ### **Corollaire 64**
+[168] Corollaire 65: ### **Corollaire 65**
+[169] Corollaire 66: ## **Corollaire 66**
+[170] Corollaire 67: ## **Corollaire 67**
+[171] Exercice 38: p.128 **Exercice 38** Soit $u$ un endomorphisme nilpotent d'indice $r$ et $x_0 \notin \tex
+[172] Exercice 39: p.128 **Exercice 39** Soit $u$ un endomorphisme d'un espace vectoriel $E$ de dimension fin
+[173] Exercice 40: p.128 **Exercice 40** Montrer que pour toute famille $(u_1, \dots, u_n)$ de $n$ endomorphi
+[174] Théorème 68: ## **Théorème 68**
+[175] Remarque: **Remarque** Matriciellement, si l'on prend une base adaptée à une telle décomposition, on
+[176] Exercice 3: ## **Exercice 3**
+[177] Exercice 4: ## **Exercice 4**
+[178] Exercice 10: **Exercice 10** Soit $P_1$ et $P_2$ deux matrices *réelles* telles que $P = P_1 + iP_2$.
+[179] Exercice 18: **Exercice 18** Dans une base adaptée au sous-espace vectoriel $\text{Im } u$, la matrice 
+[180] Exercice 19: ## **Exercice 19**
+[181] Exercice 20: ## **Exercice 20**
+[182] Exercice 22: **Exercice 22** Le polynôme caractéristique de $A$, $(X - 1)(X - 4)(X - 6)$ est scindé sim
+[183] Exercice 24: ## **Exercice 24**
+[184] Exercice 25: ## **Exercice 25**
+[185] Exercice 26: ## **Exercice 26**
+[186] Exercice 27: ## **Exercice 27**
+[187] Exercice 34: **Exercice 34** Notons $F_x = \text{Vect} \left( \left( u^k(x) \right)_{k \in \mathbb{N}} 
+[188] Exercice 35: **Exercice 35** On a vu que $\chi_A(X) = X^3 - 3X^2 + 3X - 2$. En appliquant le théorème d
+[189] Exercice 37: **Exercice 37** Le sens direct est clair puisque dans une base de diagonalisation simultan
+[190] Exercice 2.1: **2.1** Soit $u \in \mathcal{L}(E)$ avec $E$ de dimension finie.
+[191] Exercice 2.2: **2.2** Déterminer les sous-espaces de $\mathbb{R}^n$ stables par tous les endomorphismes 
+[192] Exercice 2.3: **2.3** Soit $E$ un espace vectoriel de dimension finie.
+[193] Exercice 2.4: **2.4** Soit $F$ un sous-espace vectoriel de $E$ et $\mathcal{L}_F(E)$ l'ensemble des endo
+[194] Exercice 2.6: **2.6** Soit $A = \begin{pmatrix} 1 & 2 & -2 \\ 2 & 1 & -2 \\ 2 & 2 & -3 \end{pmatrix}$.
+[195] Exercice 2.7: **2.7** Soit $B = \begin{pmatrix} 3 & 0 & 8 \\ 3 & -1 & 6 \\ -2 & 0 & -5 \end{pmatrix}$.
+[196] Exercice 2.8-part1: **2.8** Diagonaliser la matrice réelle de taille $n$ :
+[197] Exercice 2.8-part2: et la famille $(X_\ell)_{\ell \in \left[\!\left[1, n\right]\!\right]}$ est une base de dia
+[198] Exercice 2.9: **2.9** Soit $A$ une matrice de $\mathcal{M}_n(\mathbb{R})$ vérifiant $A(A^2 + A + I_n) = 
+[199] Exercice 2.10: **2.10** Soit $A \in \mathcal{M}_n(\mathbb{R})$ telle que :
+[200] Exercice 2.11: **2.11** *(Polytechnique 2015)*
+[201] Exercice 2.12: **2.12** Soit $A \in \mathcal{M}_2(\mathbb{Z})$.
+[202] Exercice 2.14: **2.14** On dit qu’un nombre complexe $\alpha$ est algébrique s’il est racine d’un polynôm
+[203] Exercice 2.15: **2.15** 1. Montrer qu’il existe $(a_0, \dots, a_{n-1}) \in \mathbb{K}^n$ tel que :
+[204] Exercice 2.16: **2.16** Déterminer les sous-espaces stables par l’endomorphisme $u$ canoniquement associé
+[205] Exercice 2.17: **2.17** Soit $a$ un endomorphisme d’un espace vectoriel de dimension finie $E$. On consid
+[206] Exercice 2.18: **2.18** Soit $u$ un endomorphisme d’un espace vectoriel $E$ de dimension finie $n$ et $\l
+[207] Exercice 2.19: **2.19** Soit $A \in \mathcal{M}_n(\mathbb{C})$ et $B = \begin{pmatrix} 0 & A \\ I_n & 0 \
+[208] Exercice 2.20: **2.20** Soit $A \in \mathcal{M}_n(\mathbb{C})$. Montrer que la matrice par blocs :
+[209] Exercice 2.21: **2.21** Soit $A$ et $B$ deux matrices de $\mathcal{M}_n(\mathbb{C})$.
+[210] Exercice 2.22: **2.22** Soit $A$ et $B$ deux matrices de $\mathcal{M}_n(\mathbb{C})$.
+[211] Exercice 2.23: **2.23** *(Polytechnique 2015)*
+[212] Exercice 2.24: **2.24** Soit $u$ et $v$ deux endomorphisme d'un $\mathbb{C}$-espace vectoriel de dimensio
+[213] Exercice 2.25: **2.25** *(Polytechnique 2015)*
+[214] Exercice 2.26: **2.26** Soit $A$ et $B$ deux matrices de $\mathcal{M}_n(\mathbb{C})$ vérifiant $AB = BA$.
+[215] Exercice 2.27: **2.27** Montrer qu'un endomorphisme $u$ est nilpotent si, et seulement s'il vérifie $\tex
+[216] Exercice 2.28: **2.28** *(Centrale 2015)*
+[217] Exercice 2.5: **2.5** Montrons le résultat par récurrence forte sur la dimension $n \in \mathbb{N}^*$ de
+[218] Exercice 2.13: **2.13** 1. Supposons par l'absurde que $Vect(x, u(x))$ ne soit pas un plan. Comme le vect
+
+=== topologie (323cec78-a770-40eb-9ed4-ac825a137e0e) ===
+[0] Introduction: # Chapitre 4 : Espaces vectoriels normés
+[1] Définition 1: **Définition 1**
+[2] Définition 2: **Définition 2**
+[3] Remarque: **Remarque** Si $N$ est une norme, alors la propriété d’homogénéité implique que $N(0) = 0
+[4] Exemple: ### Exemples
+[5] Remarque: **Remarque** Avec les notations de l’exercice 1, la norme définie par :
+[6] Exemple: **Exemples** De l’exercice 1, on déduit que les espaces préhilbertiens réels suivants sont
+[7] Définition 3: **Définition 3**
+[8] Proposition 1: **Proposition 1 (Inégalités triangulaires)**
+[9] Exercice 4: p.221 **Exercice 4** *Cas d’égalité dans l’inégalité triangulaire ?*
+[10] Exercice 5: p.221 **Exercice 5** *Démonstration de l’affirmation précédente.*
+[11] Définition 4: **Définition 4**
+[12] Remarque: ### Remarques
+[13] Exercice 6: ### **Exercice 6** Montrer que la distance $d$ associée à la norme $\|\cdot\|$ vérifie les
+[14] Proposition 2: # **Proposition 2**
+[15] Définition 5: ### **Définition 5**
+[16] Remarque: **Remarques** Avec les notations de la définition précédente :
+[17] Proposition 3: ### **Proposition 3**
+[18] Exercice 7: p.222 **Exercice 7** Dans $\mathbb{R}^2$, soit $x$ le point $(-1, 1)$ and $A$ la droite d'
+[19] Remarque: **Remarque** L'exercice précédent, montre, comme on pouvait s'y attendre, que la distance 
+[20] Définition 6: **Définition 6**
+[21] Remarque: **Remarque** On constate facilement que $S(*a, r*) = B_f(*a, r*) \setminus B(*a, r*)$.
+[22] Exercice 8: p.222 **Exercice 8** Dessiner les boules unités de $\mathbb{R}^2$ pour les normes infinie,
+[23] Remarque: **Remarque** L'exercice précédente montre que les boules dépendent de la norme considérée 
+[24] Proposition 4: **Proposition 4**
+[25] Exercice 9: p.223 **Exercice 9** Soit $B$ une boule de centre $a$ et de rayon $r > 0$, et $x$ un éléme
+[26] Définition 7: **Définition 7**
+[27] Exercice 10: p.223 **Exercice 10** Montrer que si une partie $A$ est contenue dans une boule quelconque
+[28] Exercice 11: p.224 **Exercice 11** Montrer que si $A$ est une partie non vide et bornée, alors l’ensemb
+[29] Remarque: **Remarque** Si $A$ est une partie bornée, alors la quantité
+[30] Exercice 12: p.224 **Exercice 12** *Diamètre d’une boule*
+[31] Définition 8: **Définition 8**
+[32] Remarque: **Remarques**
+[33] Remarque: **Remarque** Il est clair, d’après la définition, que la notion de partie bornée (et donc 
+[34] Proposition 5-part1: ### Proposition 5
+[35] Proposition 5-part2: * *Inégalité triangulaire.* Pour $(x, y) \in (\mathbb{K}^n)^2$, on a :
+[36] Remarque: **Remarque** Les définitions ci-dessus des normes un, deux et infinie sont licites, car, p
+[37] Exercice 13-part1: p.226 **Exercice 13** En reprenant les notations ci-dessus, justifier que les applications
+[38] Exercice 13-part2: Les familles $(|x_i|)_{i \in I}$ et $(|y_i|)_{i \in I}$ appartenant à $\mathbb{R}^{(I)}$, 
+[39] Définition 9: **Définition 9**
+[40] Exercice 14: p.227 **Exercice 14**
+[41] Exercice 15: **Exercice 15** Montrer que l'application $$ \begin{matrix} \mathcal{C}([a, b], \mathbb{K}
+[42] Exercice 16: **Exercice 16** Montrer que l'application $\begin{array}{ccc} \mathcal{C}([a, b], \mathbb{
+[43] Exercice 17: ## **Exercice 17**
+[44] Exemple: ### Exemples
+[45] Exemple: ### Exemples
+[46] Proposition 6: ### **Proposition 6**
+[47] Exemple: **Exemple** La norme infinie sur $\mathbb{K}^n$ est la norme produit obtenue en considéran
+[48] Remarque: **Remarque** En plus de la norme produit présentée dans la proposition précédente, d'autre
+[49] Définition 10: **Définition 10**
+[50] Proposition 7: ## **Proposition 7 (Unicité de la limite)**
+[51] Définition 11: ## **Définition 11**
+[52] Remarque: **Remarque** Nous verrons cependant que deux normes équivalentes définissent les mêmes sui
+[53] Proposition 8: ### **Proposition 8 (Combinaison linéaire de deux suites convergentes)**
+[54] Remarque: ### Remarques
+[55] Proposition 9: ### **Proposition 9**
+[56] Corollaire 10: ### **Corollaire 10**
+[57] Proposition 11: ### **Proposition 11**
+[58] Exemple: **Exemple** Une suite à valeurs dans $\mathbb{K}^p$ converge au sens de la norme infinie s
+[59] Proposition 12: **Proposition 12**
+[60] Définition 12: **Définition 12**
+[61] Remarque: **Remarque** D’après la proposition 12, une suite convergente ne possède que sa limite com
+[62] Exemple: **Exemple** La suite réelle de terme général $(-1)^n$ est divergente, car elle possède $1$
+[63] Exercice 22: p.231 **Exercice 22** On considère la suite de terme général $a_n = n(1+(-1)^n)$.
+[64] Proposition 13: **Proposition 13 (Caractérisation des valeurs d’adhérence)**
+[65] Exercice 23: p.232 **Exercice 23** Montrer que tout élément du segment $[-1, 1]$ est valeur d'adhérence
+[66] Définition 13: ### **Définition 13**
+[67] Définition 14: ### **Définition 14**
+[68] Remarque: **Remarque** Il est clair, d’après la définition, que $E$ et $\emptyset$ sont des parties 
+[69] Proposition 14: ## **Proposition 14**
+[70] Remarque: **Remarque** Le dessin fait lors de la démonstration précédente correspond à une norme euc
+[71] Remarque: **Remarque** Plus généralement, tout intervalle ouvert de $\mathbb{R}$, c’est-à-dire de la
+[72] Proposition 15: ## **Proposition 15**
+[73] Remarque: **Remarque** En particulier, une réunion quelconque de boules ouvertes est un ouvert de $E
+[74] Exercice 25: p.233 **Exercice 25** Montrer que toute partie ouverte de $E$ peut s’écrire comme une réun
+[75] Exercice 26: p.233 **Exercice 26** Pour tout $n \in \mathbb{N}^*$, on note $U_n = \left] -\frac{1}{n}, 
+[76] Définition 15: ### **Définition 15**
+[77] Remarque: **Remarque** D’après la définition, il est clair que $E$ et $\emptyset$ sont des parties f
+[78] Exercice 27: p.233 **Exercice 27** Montrer que tout intervalle fermé de $\mathbb{R}$, c’est-à-dire tout
+[79] Proposition 16: ### **Proposition 16**
+[80] Exemple: ## Exemples
+[81] Proposition 17: ### **Proposition 17**
+[82] Remarque: **Remarque** Plus généralement, toute partie $A$ peut-être obtenue comme une réunion de fe
+[83] Définition 16: ### **Définition 16**
+[84] Remarque: **Remarque** De manière évidente, pour que $A$ soit un voisinage de $a$, il est nécessaire
+[85] Remarque: **Remarque** On peut, sans en changer le sens, remplacer « boule ouverte » par « boule fer
+[86] Proposition 18: **Proposition 18**
+[87] Remarque: **Remarque** Le deuxième point de la proposition précédente permet d'affirmer qu'une réuni
+[88] Définition 17: **Définition 17**
+[89] Remarque: **Remarques**
+[90] Proposition 19: ### **Proposition 19**
+[91] Exercice 33: p.235 **Exercice 33** Montrer que l'intérieur d'une partie $A$ est la réunion de tous les 
+[92] Exercice 34: p.235 **Exercice 34** Montrer qu'une partie $A$ est ouverte si, et seulement si, $\mathrin
+[93] Définition 18: ### **Définition 18**
+[94] Remarque: ### **Remarque**
+[95] Proposition 20: **Proposition 20**
+[96] Proposition 21: **Proposition 21 (Caractérisation séquentielle des points adhérents)**
+[97] Remarque: **Remarque** L’exercice précédent assure que l’ensemble des valeurs d’adhérence d’une suit
+[98] Proposition 22: ### **Proposition 22 (Caractérisation séquentielle des parties fermées)**
+[99] Définition 19: ### **Définition 19**
+[100] Remarque: **Remarque** Dans la définition précédente, les propriétés *(ii)* et *(iii)* ne sont que d
+[101] Exemple: **Exemples**
+[102] Définition 20: **Définition 20**
+[103] Exemple: **Exemple** Si $B$ désigne une boule de centre $a \in E$ et de rayon $r > 0$, alors $\text
+[104] Exercice 40: p.236 **Exercice 40** Soit $a$ et $b$ deux réels tels que $a < b$.
+[105] Exercice 41: p.237 **Exercice 41** Soit $A$ une partie de $E$. Montrer que :
+[106] Remarque: **Remarque** Du résultat de l'exercice précédent il résulte que :
+[107] Proposition 23: **Proposition 23**
+[108] Définition 21: **Définition 21**
+[109] Exercice 42: p.237 **Exercice 42** On travaille dans $\mathbb{R}$. Montrer que l'intervalle $[0, 1[$, b
+[110] Exercice 43: p.237 **Exercice 43** On se place dans $\mathbb{R}$. Montrer que l'intervalle $]0, 1]$, bi
+[111] Exercice 44: p.237 **Exercice 44** Montrer que toute partie $A$ de $E$ est à la fois un ouvert relatif 
+[112] Exercice 45: p.237 **Exercice 45** On travaille dans $\mathbb{C}$. Montrer que l'intervalle $[0, 2]$, b
+[113] Exercice 46: p.237 **Exercice 46** Soit $A$ une partie d'un espace vectoriel normé $E$. Soit $G$ une pa
+[114] Exercice 47: p.238 **Exercice 47** *Caractérisation séquentielle des fermés relatifs*
+[115] Exemple: ### Exemples
+[116] Définition 22: # **Définition 22**
+[117] Remarque: **Remarque** La propriété $N_1 \leqslant \alpha N_2$ s’interprète ainsi : la boule unité p
+[118] Proposition 24: ## **Proposition 24**
+[119] Proposition 25: ## **Proposition 25**
+[120] Remarque: **Remarque** Avec les notations de la proposition précédente, si une application $f$ à val
+[121] Proposition 26: ## **Proposition 26**
+[122] Remarque: **Remarque** Étant donné deux normes $N_1$ et $N_2$, pour montrer que $N_1$ n'est pas domi
+[123] Point méthode: **Point méthode**
+[124] Définition 23: ### **Définition 23**
+[125] Exercice 51: p.239 **Exercice 51** Montrer que deux normes sont équivalentes si, et seulement si, chacu
+[126] Exercice 52: p.240 **Exercice 52**
+[127] Exercice 53: p.240 **Exercice 53** *Équivalence des normes un, deux et infini dans* $\mathbb{K}^n$
+[128] Proposition 27: ### **Proposition 27 (Conservation du caractère borné d'une partie)**
+[129] Remarque: **Remarque** Ce résultat s'applique en particulier aux applications bornées et aux suites 
+[130] Proposition 28: ### **Proposition 28 (Conservation du caractère convergent d'une suite)**
+[131] Proposition 29: **Proposition 29 (Conservation des ouverts et des fermés)**
+[132] Point méthode: ### **Point méthode**
+[133] Exercice 1: ### **Exercice 1**
+[134] Exercice 2: ### **Exercice 2**
+[135] Exercice 3: ### **Exercice 3**
+[136] Remarque: **Remarque.** On peut cependant montrer que ces deux applications vérifient la propriété d
+[137] Exercice 18: ## Exercice 18
+[138] Exercice 19: ## Exercice 19
+[139] Exercice 20: **Exercice 20** Dans ce qui suit, $x = (x_1, \dots, x_p)$ et $y = (y_1, \dots, y_p)$ sont 
+[140] Exercice 21: ## **Exercice 21**
+[141] Exercice 24: **Exercice 24**
+[142] Exercice 28: ## **Exercice 28**
+[143] Exercice 29: ## **Exercice 29** Soit $S$ une sphère. Notons *a* son centre et *r* son rayon. Par défini
+[144] Exercice 30: ## **Exercice 30** Comme $F$ est un fermé de $E$, son complémentaire $E \setminus F$ est u
+[145] Exercice 31: ## **Exercice 31** Cette propriété découle immédiatement des définitions d’un ouvert et d’
+[146] Exercice 32: ## **Exercice 32**
+[147] Remarque: ### **Remarque**
+[148] Exercice 35: ### **Exercice 35**
+[149] Exercice 36: **Exercice 36** C’est une conséquence de la proposition 20 de la page 212. En effet, l’int
+[150] Exercice 37: ## **Exercice 37**
+[151] Exercice 38: ## **Exercice 38**
+[152] Exercice 39: ## **Exercice 39**
+[153] Exercice 48: ## **Exercice 48**
+[154] Exercice 49: ### **Exercice 49** Soit $f$ est une fonction continue de $[*a, b*]$ dans $\mathbb{K}$.
+[155] Exercice 50: ### **Exercice 50**
+[156] Exercice 54: **Exercice 54** Tout d’abord, il facile de voir que $N_1$ et $N_2$ sont bien des normes su
+[157] Exercice 4.1: **4.1** Montrer que l'application $N : P \mapsto \sup_{t \in [0,1]} |P(t) - P'(t)|$ est un
+[158] Exercice 4.2: **4.2** Soit $E$ un espace vectoriel normé, et $F$ un sous-espace vectoriel de $E$.
+[159] Exercice 4.3-part1: **4.3** Soit $E$ et $F$ deux $\mathbb{K}$-espaces vectoriels normés. On munit $E \times F$
+[160] Exercice 4.3-part2: 3.  Par définition, on a :
+[161] Exercice 4.4: **4.4** Montrer que l'adhérence et l'intérieur d'une partie convexe sont convexes.
+[162] Exercice 4.5: **4.5** Soit $n$ un entier au moins égal à 2. Existe-t-il une norme $\|\cdot\|$ sur $\math
+[163] Exercice 4.6: **4.6** On se place dans l'espace des suites réelles bornées, que l'on munit de la norme i
+[164] Exercice 4.7-part1: **4.7** *Norme p sur* $\mathbb{K}^n$
+[165] Exercice 4.7-part2: Soit $k \in [\![1, n]\!]$. On a, par inégalité triangulaire et croissance de $u \mapsto u^
+[166] Remarque: **Remarque** Pour cet exercice, on aurait aussi pu remarquer que $N = \mathcal{N}_\infty \
+[167] Remarque: **Remarque** L’inégalité triangulaire associé à la norme $p$ :
+[168] Exercice 4.8-part1: **4.8** 1. Les propriétés d’homogénéité et de séparation sont faciles à vérifier.
+[169] Exercice 4.8-part2: * Les inégalités (2) et (3) donnent l’encadrement suivant :
+[170] Remarque: **Remarque** L’inégalité triangulaire associée à la norme $p$ :
+[171] Exercice 4.9: **4.9** 1. Utilisons la caractérisation séquentielle des fermés. Soit $(P_n)$ une suite de
+[172] Exercice 4.10: **4.10** 1. Il est clair que $E$ et $\emptyset$ ont une frontière vide. Montrons que ce so
+[173] Exercice 4.11: **4.11** • **Intérieur au sens de la norme infinie.** Montrons que, pour la norme infinie,
+[174] Remarque: **Remarque** Pour montrer que $F$ est un fermé au sens de la norme infinie, on peut aussi 
+[175] Exercice 4.12: **4.12** Soit $H$ un hyperplan de $E$. Supposons que $H$ n'est pas fermé et montrons que $
+[176] Exercice 4.13: **4.13** 1. Il est clair que $E$ est un sous-espace vectoriel de $\mathcal{C}^2([0, 1], \m
+

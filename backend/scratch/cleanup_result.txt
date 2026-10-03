@@ -1,0 +1,3 @@
+Remaining documents after duplicate delete:
+69bcf8d2-8c81-4325-b3f9-4109191599e2  Chapitre 2 : Réduction des endomorphismes
+99563cb9-2e46-4cb7-b7bd-08ca949a0332  Chapitre 4 : Espaces vectoriels normés

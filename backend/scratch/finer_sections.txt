@@ -1,0 +1,42 @@
+=== Chapitre 2 : Réduction des endomorphismes (15 parts) ===
+  321: 'Sous-espaces stables et endomorphismes induits'
+  6890: 'Éléments propres'
+  6912: "Définition des éléments propres d'un endomorphisme"
+  14632: 'Rappels sur les matrices semblables'
+  17119: "Éléments propres d'une matrice carrée"
+  23424: 'Polynômes annulateurs'
+  29979: 'Polynôme caractéristique'
+  48111: 'Endomorphismes et matrices diagonalisables'
+  60165: 'Endomorphismes et matrices trigonalisables'
+  67564: 'Utilisations des polynômes annulateurs'
+  67607: 'Polynôme minimal'
+  71197: 'Théorème de Cayley-Hamilton'
+  73819: 'Lemme de décomposition des noyaux'
+  82166: 'Polynômes annulateurs et diagonalisabilité'
+  84514: 'Endomorphismes nilpotents, matrices nilpotentes'
+=== Chapitre 4 : Espaces vectoriels normés (25 parts) ===
+  245: 'Généralités'
+  262: 'Définition'
+  3967: 'Inégalités triangulaires'
+  6486: 'Distance associée à une norme'
+  11083: 'Boule ouverte, boule fermée'
+  12719: 'Partie bornée, application bornée'
+  14989: "Exemples d'espaces vectoriels normés"
+  22444: 'Obtention de nouveaux espaces vectoriels normés'
+  25653: "Suites d'éléments d'un espace vectoriel normé"
+  27605: 'Suite convergente'
+  32550: 'Suite à valeurs dans un espace produit'
+  35114: "Suite extraite, valeur d'adhérence"
+  37667: 'Relations de comparaison'
+  38729: "Topologie d'un espace vectoriel normé"
+  38774: 'Parties ouvertes'
+  42327: 'Parties fermées'
+  45402: "Voisinage d'un point"
+  46733: "Point intérieur, intérieur d'une partie"
+  48443: "Point adhérent, adhérence d'une partie"
+  52562: 'Densité'
+  53806: 'Frontière'
+  55549: 'Ouvert relatif, fermé relatif, voisinage relatif'
+  57636: 'Comparaison de normes'
+  58892: 'Domination de normes'
+  61672: 'Normes équivalentes'

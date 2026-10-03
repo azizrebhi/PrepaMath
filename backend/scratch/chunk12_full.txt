@@ -1,0 +1,33 @@
+**Proposition 4**
+Soit $\mathcal{B} = (\mathcal{B}_1, \dots, \mathcal{B}_p)$ une base adaptée à une décomposition $E = \bigoplus_{1 \leqslant i \leqslant p} E_i$.
+
+L'endomorphisme $u$ stabilise chaque $E_i$ si, et seulement si, sa matrice dans la base $\mathcal{B}$ est diagonale par blocs, c'est-à-dire de la forme :
+
+$$
+\begin{pmatrix}
+A_1 & 0 & \cdots & 0 \\
+0 & \ddots & \ddots & \vdots \\
+\vdots & \ddots & \ddots & 0 \\
+0 & \cdots & 0 & A_p
+\end{pmatrix},
+$$
+
+où, pour tout $i \in \llbracket 1, p \rrbracket$, la matrice $A_i$ est carrée d'ordre $\dim E_i$.
+
+Dans ce cas, pour tout $i \in \llbracket 1, p \rrbracket$, $A_i$ est la matrice dans la base $\mathcal{B}_i$ de l'endomorphisme induit par $u$ sur $E_i$.
+
+
+Démonstration page 108
+
+
+# II Éléments propres
+## 1 Définition des éléments propres d'un endomorphisme
+
+--- Solution (Proposition 4) ---
+
+## **Proposition 4**
+
+Le sous-espace $E_i$ est stable par $u$ si, et seulement si, les vecteurs de $B_i$ ont pour image par $u$ un vecteur de $E_i$, c'est-à-dire une combinaison linéaire de vecteurs de $B_i$. On en déduit facilement l'équivalence annoncée et l'interprétation des matrices $A_i$.
+
+
+***Démonstrations et solutions des exercices du cours***

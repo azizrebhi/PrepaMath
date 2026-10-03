@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
@@ -16,18 +16,28 @@ const MARKDOWN_COMPONENTS = {
   ul: ({ node, ...props }) => <ul className="list-disc pl-5 space-y-1" {...props} />,
 };
 
-export default function RightPanel() {
+export default function RightPanel({ selectedPartId }) {
   const { chapterId } = useParams();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [conversationId, setConversationId] = useState(null);
   const { token } = useAuth();
+
+  // A conversation belongs to one chapter — reset if the student navigates
+  // to a different document entirely (switching sections within the same
+  // chapter should NOT reset this, which is why this depends on chapterId
+  // only, not selectedPartId).
+  useEffect(() => {
+    setMessages([]);
+    setConversationId(null);
+  }, [chapterId]);
 
   async function handleSubmit(e) {
     e.preventDefault();
     const query = input.trim();
-    if (!query || loading) return;
+    if (!query || loading || !selectedPartId) return;
 
     setMessages((prev) => [...prev, { role: "user", content: query }]);
     setInput("");
@@ -41,12 +51,17 @@ export default function RightPanel() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({
+          query,
+          current_part_id: selectedPartId,
+          conversation_id: conversationId,
+        }),
       });
       if (!res.ok) {
         throw new Error(`Échec de la requête : ${res.status}`);
       }
       const data = await res.json();
+      setConversationId(data.conversation_id);
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: data.answer, sources: data.sources },
@@ -59,29 +74,29 @@ export default function RightPanel() {
   }
 
   return (
-    <div className="flex flex-col h-full text-neutral-100">
-      <div className="flex-shrink-0 flex items-center justify-between border-b border-neutral-800 p-4">
-        <span>Tuteur IA</span>
-        <span className="text-xs text-neutral-500">
+    <div className="flex flex-col h-full text-ink">
+      <div className="flex-shrink-0 flex items-center justify-between border-b border-border-subtle p-4">
+        <span className="font-semibold text-base">Tuteur IA</span>
+        <span className="text-sm text-ink-muted">
           {loading ? "Réflexion en cours..." : "Statut : actif"}
         </span>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <p className="text-sm text-neutral-500">Pose une question sur ce chapitre.</p>
+          <p className="text-sm text-ink-muted">Pose une question sur ce chapitre.</p>
         )}
 
         {messages.map((m, i) => (
           <div
             key={i}
-            className={`p-3 rounded border text-sm ${
+            className={`p-4 rounded-md border text-base ${
               m.role === "user"
-                ? "bg-neutral-800 border-neutral-700 ml-8"
-                : "bg-neutral-900 border-neutral-800 mr-8"
+                ? "bg-accent-violet-bg border-accent-violet-bg ml-8"
+                : "bg-surface border-border-subtle mr-8"
             }`}
           >
-            <div className="prose-sm prose-invert max-w-none [&_p]:m-0">
+            <div className="prose prose-invert max-w-none prose-p:text-ink prose-li:text-ink prose-strong:text-ink [&_p]:m-0">
               <ReactMarkdown
                 remarkPlugins={[remarkMath]}
                 rehypePlugins={[rehypeKatex]}
@@ -91,11 +106,11 @@ export default function RightPanel() {
               </ReactMarkdown>
             </div>
             {m.sources && m.sources.length > 0 && (
-              <div className="mt-2 pt-2 border-t border-neutral-800 flex flex-wrap gap-1">
+              <div className="mt-2 pt-2 border-t border-border-subtle flex flex-wrap gap-1">
                 {m.sources.map((s, j) => (
                   <span
                     key={j}
-                    className="text-xs text-neutral-500 bg-neutral-950 px-2 py-0.5 rounded"
+                    className="text-xs font-medium text-accent-amber-text bg-accent-amber-bg px-2 py-0.5 rounded-full"
                   >
                     {s.number ? `${s.chunk_type} ${s.number}` : s.chunk_type}
                   </span>
@@ -106,24 +121,24 @@ export default function RightPanel() {
         ))}
 
         {error && (
-          <p className="text-sm text-red-400">Échec de la réponse : {error}</p>
+          <p className="text-sm text-accent-red-text">Échec de la réponse : {error}</p>
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="flex-shrink-0 border-t border-neutral-800 p-4">
+      <form onSubmit={handleSubmit} className="flex-shrink-0 border-t border-border-subtle p-4">
         <div className="flex items-center gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Pose ta question sur ce chapitre..."
-            disabled={loading}
-            className="flex-1 bg-neutral-900 border border-neutral-800 p-2 rounded outline-none text-sm disabled:opacity-50"
+            disabled={loading || !selectedPartId}
+            className="flex-1 bg-canvas border border-border-subtle text-ink placeholder:text-ink-muted px-3 py-2.5 rounded-md outline-none text-base disabled:opacity-50"
           />
           <button
             type="submit"
-            disabled={loading || !input.trim()}
-            className="bg-neutral-800 border border-neutral-700 px-4 py-2 rounded text-sm hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading || !input.trim() || !selectedPartId}
+            className="bg-accent-amber-text text-[#18181a] font-medium px-4 py-2 rounded-md text-sm hover:bg-[#e6910d] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Envoyer
           </button>

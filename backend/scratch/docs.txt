@@ -1,0 +1,2 @@
+69bcf8d2-8c81-4325-b3f9-4109191599e2	Chapitre 2 : Réduction des endomorphismes	llamaparse_outout.md	ready	2026-09-29 19:03:39.053767+00:00
+99563cb9-2e46-4cb7-b7bd-08ca949a0332	Chapitre 4 : Espaces vectoriels normés	chap_topologie.md	ready	2026-09-29 19:08:13.419168+00:00

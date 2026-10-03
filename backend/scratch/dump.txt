@@ -1,0 +1,36 @@
+---MATCH at 6126---
+'e dans la base $B$, les endomorphismes de $E$ qui stabilisent chaque $F_i$.\n\n\nI Éléments propres\n\n**Proposition 4**\nSoit $\\mathcal{B} = (\\mathcal{B}_1, \\dots, \\'
+
+---MATCH at 6895---
+"i$ de l'endomorphisme induit par $u$ sur $E_i$.\n\n\nDémonstration page 108\n\n\n# II Éléments propres\n## 1 Définition des éléments propres d'un endomorphisme\n\n**Défi"
+
+---MATCH at 11064---
+'ation.\n\nDéterminer les valeurs propres et les sous-espaces propres de $D$.\n\n\nII Éléments propres\n\np.109 **Exercice 6** Soit $E = \\mathbb{C}^{\\mathbb{N}}$, l’esp'
+
+---MATCH at 15169---
+"MP,*$$\noù $P$ est la matrice de passage de $\\mathcal{B}$ à $\\mathcal{B}'$.\n\n\nII Éléments propres\n\n## **Définition 5**\nDeux matrices $A$ et $B$ de $\\mathcal{M}_n"
+
+---MATCH at 17124---
+"t vérifie $AX = \\lambda X$.\n\nCela justifie les définitions qui suivent.\n\n\n\n## 3 Éléments propres d'une matrice carrée\n\n**Définition 6**\n***\nSoit $A \\in \\mathcal"
+
+---MATCH at 18878---
+", d'après l'exercice précédents, deux valeurs propres $L - M$ et $L + 2M$.\n\n\nII Éléments propres\n\n\n\nOn peut rechercher les éléments propres d’une matrice en étu"
+
+---MATCH at 23690---
+"r à partir de la page 31). Dans un souci d'unification des deux cas qui se\n\n\nII Éléments propres\n\nprésentent ici, nous avons défini la substitution polynomiale "
+
+---MATCH at 27648---
+"leur propre de l'endomorphisme nul $P(u)$ donc $P(\\lambda) = 0$. $\\square$\n\n\nII Éléments propres\n\n### **Exemple**\n\nOn retrouve le fait que si $p$ est un project"
+
+---MATCH at 31656---
+'lambda I_n) = (-1)^n \\chi_A(\\lambda)$, on en déduit le résultat. $\\square$\n\n\nII Éléments propres\n\n## **Proposition 25**\n\nSi $A \\in \\mathcal{M}_n(\\mathbb{K})$ es'
+
+---MATCH at 36143---
+'_D(X).$$\nCe résultat se généralise à toute matrice triangulaire par blocs.\n\n\nII Éléments propres\n\np.113 **Exercice 15** Soit $A \\in \\mathcal{M}_n(\\mathbb{K})$. '
+
+---MATCH at 40162---
+'$\\mathbb{C}$-espace vectoriel n’admet pas nécessairement de valeur propre.\n\n\nII Éléments propres\n\n### **Proposition 32**\n> Si $F$ est un sous-espace vectoriel d'
+
+---MATCH at 44516---
+'epsilon(\\sigma) \\prod_{i=1}^n (X\\delta_{\\sigma(i),i} - a_{\\sigma(i),i}).$$\n\n\nII Éléments propres\n\n*   Si $\\sigma$ laisse invariants au plus $n-3$ entiers de $[\\'
+

@@ -1,0 +1,44 @@
+=== Chapitre 2 : Réduction des endomorphismes ===
+Total sections found: 15, surviving (non-empty): 13
+  [0] 'Sous-espaces stables et endomorphismes induits' -> 12 chunks
+  [2] "Définition des éléments propres d'un endomorphisme" -> 17 chunks
+  [3] 'Rappels sur les matrices semblables' -> 5 chunks
+  [4] "Éléments propres d'une matrice carrée" -> 12 chunks
+  [5] 'Polynômes annulateurs' -> 14 chunks
+  [6] 'Polynôme caractéristique' -> 36 chunks
+  [7] 'Endomorphismes et matrices diagonalisables' -> 23 chunks
+  [8] 'Endomorphismes et matrices trigonalisables' -> 15 chunks
+  [10] 'Polynôme minimal' -> 12 chunks
+  [11] 'Théorème de Cayley-Hamilton' -> 4 chunks
+  [12] 'Lemme de décomposition des noyaux' -> 6 chunks
+  [13] 'Polynômes annulateurs et diagonalisabilité' -> 4 chunks
+  [14] 'Endomorphismes nilpotents, matrices nilpotentes' -> 58 chunks
+Skipped (empty): ['Éléments propres', 'Utilisations des polynômes annulateurs']
+
+=== Chapitre 4 : Espaces vectoriels normés ===
+Total sections found: 25, surviving (non-empty): 23
+  [1] 'Définition' -> 7 chunks
+  [2] 'Inégalités triangulaires' -> 3 chunks
+  [3] 'Distance associée à une norme' -> 9 chunks
+  [4] 'Boule ouverte, boule fermée' -> 6 chunks
+  [5] 'Partie bornée, application bornée' -> 8 chunks
+  [6] "Exemples d'espaces vectoriels normés" -> 10 chunks
+  [7] 'Obtention de nouveaux espaces vectoriels normés' -> 2 chunks
+  [8] "Suites d'éléments d'un espace vectoriel normé" -> 3 chunks
+  [9] 'Suite convergente' -> 8 chunks
+  [10] 'Suite à valeurs dans un espace produit' -> 2 chunks
+  [11] "Suite extraite, valeur d'adhérence" -> 7 chunks
+  [12] 'Relations de comparaison' -> 1 chunks
+  [14] 'Parties ouvertes' -> 9 chunks
+  [15] 'Parties fermées' -> 7 chunks
+  [16] "Voisinage d'un point" -> 5 chunks
+  [17] "Point intérieur, intérieur d'une partie" -> 5 chunks
+  [18] "Point adhérent, adhérence d'une partie" -> 6 chunks
+  [19] 'Densité' -> 3 chunks
+  [20] 'Frontière' -> 6 chunks
+  [21] 'Ouvert relatif, fermé relatif, voisinage relatif' -> 7 chunks
+  [22] 'Comparaison de normes' -> 1 chunks
+  [23] 'Domination de normes' -> 8 chunks
+  [24] 'Normes équivalentes' -> 53 chunks
+Skipped (empty): ['Généralités', "Topologie d'un espace vectoriel normé"]
+

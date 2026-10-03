@@ -1,0 +1,16 @@
+### Exemples
+1. Les sous-espaces vectoriels $\{0\}$ et $E$ sont stables par tout endomorphisme. Il existe des endomorphismes pour lesquels il n'y en a pas d'autres. Par exemple, une rotation vectorielle $r$ d'angle $\theta \notin \pi\mathbb{Z}$ du plan euclidien.
+   
+   En effet, pour tout vecteur $x$ non nul, la droite $\mathbb{R}x$ n'est pas stable car, comme $\theta$ n'est pas multiple entier de $\pi$, $r(x) \notin \text{Vect}(x)$. Ainsi $r$ ne stabilise aucune droite.
+
+2. À l'opposé, une homothétie stabilise tous les sous-espaces vectoriels de $E$.
+   
+   Il est évident qu'un endomorphisme stabilise tous les sous-espaces vectoriels de $E$ si, et seulement s'il stabilise toutes les droites de $E$.
+   
+   L'exercice qui suit montre que, réciproquement, cette propriété caractérise les homothéties. Pour cela, on utilise un résultat classique sur les homothéties qui a déjà été vu en première année.
+
+3. Tout sous-espace vectoriel inclus dans le noyau de $u$ ou contenant l'image de $u$ est stable par $u$.
+
+4. L'intersection et la somme de sous-espaces vectoriels stables par $u$ sont stables par $u$.
+
+I Sous-espaces stables et endomorphismes induits

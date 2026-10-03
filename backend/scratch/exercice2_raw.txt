@@ -1,0 +1,24 @@
+p.107 **Exercice 2** Soit $D$ la dérivation de $\mathbb{K}[X]$.
+
+1. Soit $F$ un sous-espace vectoriel de $\mathbb{K}[X]$ stable par $D$ et contenant un polynôme $P$ non nul de degré $d$. Montrer que $\mathbb{K}_d[X] \subset F$.
+2. Déterminer tous les sous-espaces vectoriels de $\mathbb{K}[X]$ stables par $D$.
+   **Indication** Si $F$ est stable par $D$, on pourra distinguer deux cas, selon que l'ensemble des degrés des polynômes de $F$ est majoré ou non.
+
+--- Solution (Exercice 2) ---
+
+## **Exercice 2**
+
+1. Comme $P \in F$, avec $F$ stable par $D$, on a :
+   $$\forall k \in [0, d] \quad P^{(k)} = D^k(P) \in F.$$
+
+   La famille $\left(P^{(k)}\right)_{0 \leqslant k \leqslant d}$ est libre, car échelonnée en degré ; comme c'est une famille de polynômes de $K_d[X]$ comportant $d+1 = \dim K_d[X]$, c'en est une base. On a montré que $K_d[X] \subset F$.
+
+2. Soit $F \neq \{0\}$ un sous-espace vectoriel de $K[X]$ stable par $D$ ; notons $A$ l'ensemble des degrés des polynômes non nuls de $F$. Il s'agit donc d'une partie de $N$ non vide.
+
+- Si $A$ est majoré, alors $A$ admet un plus grand élément, que l'on note $d$. Par suite, $F \subset K_d[X]$ et il existe $P \in F$ de degré $d$ donc, d'après la première question, on a $K_d[X] \subset F$ puis $F = K_d[X]$.
+
+- Sinon, pour tout $n \in N$, il existe $P \in A$ tel que $d := \deg P \geqslant n$. D'après la première question, on a $K_n[X] \subset K_d[X] \subset F$. Comme cette inclusion est vraie pour tout $n \in N$, on a $F = K[X]$.
+
+Réciproquement, pour tout $d \in N$, $K_d[X]$ est stable par $D$.
+
+En conclusion, les sous-espaces vectoriels de $K[X]$ stables par $D$ sont $\{0\}$, $K[X]$ et les $K_d[X]$, avec $d \in N$.

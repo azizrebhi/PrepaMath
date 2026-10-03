@@ -1,0 +1,42 @@
+=== Chapitre 2 : Réduction des endomorphismes ===
+  order=0 'Sous-espaces stables et endomorphismes induits' chunks=12
+  order=1 "Définition des éléments propres d'un endomorphisme" chunks=17
+  order=2 'Rappels sur les matrices semblables' chunks=5
+  order=3 "Éléments propres d'une matrice carrée" chunks=12
+  order=4 'Polynômes annulateurs' chunks=14
+  order=5 'Polynôme caractéristique' chunks=36
+  order=6 'Endomorphismes et matrices diagonalisables' chunks=23
+  order=7 'Endomorphismes et matrices trigonalisables' chunks=15
+  order=8 'Polynôme minimal' chunks=12
+  order=9 'Théorème de Cayley-Hamilton' chunks=4
+  order=10 'Lemme de décomposition des noyaux' chunks=6
+  order=11 'Polynômes annulateurs et diagonalisabilité' chunks=4
+  order=12 'Endomorphismes nilpotents, matrices nilpotentes' chunks=58
+  total parts: 13
+
+=== Chapitre 4 : Espaces vectoriels normés ===
+  order=0 'Définition' chunks=7
+  order=1 'Inégalités triangulaires' chunks=3
+  order=2 'Distance associée à une norme' chunks=9
+  order=3 'Boule ouverte, boule fermée' chunks=6
+  order=4 'Partie bornée, application bornée' chunks=8
+  order=5 "Exemples d'espaces vectoriels normés" chunks=10
+  order=6 'Obtention de nouveaux espaces vectoriels normés' chunks=2
+  order=7 "Suites d'éléments d'un espace vectoriel normé" chunks=3
+  order=8 'Suite convergente' chunks=8
+  order=9 'Suite à valeurs dans un espace produit' chunks=2
+  order=10 "Suite extraite, valeur d'adhérence" chunks=7
+  order=11 'Relations de comparaison' chunks=1
+  order=12 'Parties ouvertes' chunks=9
+  order=13 'Parties fermées' chunks=7
+  order=14 "Voisinage d'un point" chunks=5
+  order=15 "Point intérieur, intérieur d'une partie" chunks=5
+  order=16 "Point adhérent, adhérence d'une partie" chunks=6
+  order=17 'Densité' chunks=3
+  order=18 'Frontière' chunks=6
+  order=19 'Ouvert relatif, fermé relatif, voisinage relatif' chunks=7
+  order=20 'Comparaison de normes' chunks=1
+  order=21 'Domination de normes' chunks=8
+  order=22 'Normes équivalentes' chunks=53
+  total parts: 23
+
