@@ -65,6 +65,12 @@ def build_tutor_graph(session: AsyncSession ,client: AsyncOpenAI):
             "le sujet, même si tu serais capable d'y répondre toi-même. Si le "
             "texte ne traite pas explicitement de ce sujet précis, réponds "
             "'corpus', même si la question te semble simple.\n\n"
+            "Exception : si la question est une demande générique qui se réfère "
+            "au contenu actuellement affiché plutôt qu'à un sujet précis "
+            "(par exemple « explique cette partie », « résume cette section », "
+            "« reformule ça », « je ne comprends pas ce passage »), réponds "
+            "toujours 'section' — une telle question n'a pas de sujet externe à "
+            "rechercher, elle porte par définition sur le texte déjà fourni.\n\n"
             f"Texte de la section actuelle :\n{state['section_content']}\n\n"
             f"Question de l'étudiant : {state['question']}\n\n"
             "Ce texte aborde-t-il explicitement le sujet de cette question ?"
@@ -106,9 +112,17 @@ def build_tutor_graph(session: AsyncSession ,client: AsyncOpenAI):
         return {"context": context}
 
     async def generate_node(state: TutorState) -> dict:
-        # Section branch already has everything it needs in section_content —
-        # corpus branch's context comes from corpus_retrieval_node instead.
-        context = state["context"] if state["route"] == "corpus" else state["section_content"]
+        # Even on the corpus branch, keep the current section as grounding —
+        # a misclassified self-referential question ("explique cette partie")
+        # would otherwise lose the current part entirely and get answered
+        # from whatever unrelated chunk the corpus search happened to match.
+        if state["route"] == "corpus":
+            context = (
+                f"Section actuellement affichée à l'étudiant :\n{state['section_content']}\n\n"
+                f"Autres passages du cours pouvant être pertinents :\n{state['context']}"
+            )
+        else:
+            context = state["section_content"]
         messages = (
             [{"role": "system", "content": SYSTEM_PROMPT}]
             + state["history"]

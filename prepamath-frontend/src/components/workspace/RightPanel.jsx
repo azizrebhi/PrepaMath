@@ -23,21 +23,50 @@ export default function RightPanel({ selectedPartId }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [conversationId, setConversationId] = useState(null);
+  const [loadingHistory, setLoadingHistory] = useState(true);
   const { token } = useAuth();
 
-  // A conversation belongs to one chapter — reset if the student navigates
-  // to a different document entirely (switching sections within the same
-  // chapter should NOT reset this, which is why this depends on chapterId
-  // only, not selectedPartId).
+  // A conversation belongs to one chapter — restore it from the backend
+  // (messages were already being persisted there; nothing was ever fetching
+  // them back, which is why history vanished on every reload). Switching
+  // sections within the same chapter should NOT touch this, which is why
+  // this depends on chapterId only, not selectedPartId.
   useEffect(() => {
-    setMessages([]);
-    setConversationId(null);
-  }, [chapterId]);
+    let cancelled = false;
+
+    async function loadConversation() {
+      setLoadingHistory(true);
+      try {
+        const res = await fetch(`${API_BASE_URL}/documents/${chapterId}/conversation`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          throw new Error(`Échec de la requête : ${res.status}`);
+        }
+        const data = await res.json();
+        if (cancelled) return;
+        setConversationId(data.conversation_id);
+        setMessages(data.messages.map((m) => ({ role: m.role, content: m.content })));
+      } catch {
+        if (!cancelled) {
+          setMessages([]);
+          setConversationId(null);
+        }
+      } finally {
+        if (!cancelled) setLoadingHistory(false);
+      }
+    }
+
+    loadConversation();
+    return () => {
+      cancelled = true;
+    };
+  }, [chapterId, token]);
 
   async function handleSubmit(e) {
     e.preventDefault();
     const query = input.trim();
-    if (!query || loading || !selectedPartId) return;
+    if (!query || loading || loadingHistory || !selectedPartId) return;
 
     setMessages((prev) => [...prev, { role: "user", content: query }]);
     setInput("");
@@ -83,7 +112,11 @@ export default function RightPanel({ selectedPartId }) {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 && (
+        {loadingHistory && (
+          <p className="text-sm text-ink-muted">Chargement de la conversation...</p>
+        )}
+
+        {!loadingHistory && messages.length === 0 && (
           <p className="text-sm text-ink-muted">Pose une question sur ce chapitre.</p>
         )}
 
@@ -132,12 +165,12 @@ export default function RightPanel({ selectedPartId }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Pose ta question sur ce chapitre..."
-            disabled={loading || !selectedPartId}
+            disabled={loading || loadingHistory || !selectedPartId}
             className="flex-1 bg-canvas border border-border-subtle text-ink placeholder:text-ink-muted px-3 py-2.5 rounded-md outline-none text-base disabled:opacity-50"
           />
           <button
             type="submit"
-            disabled={loading || !input.trim() || !selectedPartId}
+            disabled={loading || loadingHistory || !input.trim() || !selectedPartId}
             className="bg-accent-amber-text text-[#18181a] font-medium px-4 py-2 rounded-md text-sm hover:bg-[#e6910d] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Envoyer

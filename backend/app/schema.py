@@ -27,6 +27,16 @@ class AskResponse(BaseModel):
     conversation_id: UUID
     sources: list[Source] = []
 
+
+class MessageOut(BaseModel):
+    role: str
+    content: str
+
+
+class ConversationOut(BaseModel):
+    conversation_id: UUID | None
+    messages: list[MessageOut] = []
+
 class RetrieveRequest(BaseModel):
     query: str = Field(min_length=2)
     limit: int = Field(default=10, ge=1, le=20)

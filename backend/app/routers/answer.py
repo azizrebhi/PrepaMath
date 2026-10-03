@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth import current_active_user
 from app.database import get_async_session
 from app.model import Conversation, Message, User
-from app.schema import AskRequest, AskResponse
+from app.schema import AskRequest, AskResponse, ConversationOut, MessageOut
 from app.services.tutor_graph import build_tutor_graph
 
 open_ai_key = os.getenv("OPEN_AI_KEY")
@@ -19,6 +19,41 @@ router = APIRouter(
     prefix="/documents/{document_id}",
     tags=["answer"],
 )
+
+
+@router.get("/conversation", response_model=ConversationOut)
+async def get_latest_conversation(
+    document_id: uuid.UUID,
+    session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(current_active_user),
+):
+    """The frontend has no other way to know a conversation exists — nothing
+    was fetching this before, which is why history vanished on every reload
+    even though messages were already being saved correctly."""
+
+    conversation = (
+        await session.execute(
+            select(Conversation)
+            .where(Conversation.document_id == document_id, Conversation.user_id == user.id)
+            .order_by(Conversation.created_at.desc())
+        )
+    ).scalars().first()
+
+    if conversation is None:
+        return ConversationOut(conversation_id=None, messages=[])
+
+    messages = (
+        await session.execute(
+            select(Message)
+            .where(Message.conversation_id == conversation.id)
+            .order_by(Message.created_at)
+        )
+    ).scalars().all()
+
+    return ConversationOut(
+        conversation_id=conversation.id,
+        messages=[MessageOut(role=m.role, content=m.content) for m in messages],
+    )
 
 
 @router.post("/ask", response_model=AskResponse)
