@@ -16,7 +16,7 @@ const MARKDOWN_COMPONENTS = {
   ul: ({ node, ...props }) => <ul className="list-disc pl-5 space-y-1" {...props} />,
 };
 
-export default function RightPanel({ selectedPartId }) {
+export default function RightPanel({ selectedPartId, currentLessonChunkIds }) {
   const { chapterId } = useParams();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -83,6 +83,7 @@ export default function RightPanel({ selectedPartId }) {
         body: JSON.stringify({
           query,
           current_part_id: selectedPartId,
+          current_chunk_ids: currentLessonChunkIds,
           conversation_id: conversationId,
         }),
       });

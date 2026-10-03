@@ -18,9 +18,14 @@ SYSTEM_PROMPT = (
     "Tu es un tuteur de mathématiques pour un étudiant de classe préparatoire. "
     "Réponds à la question de l'étudiant en te basant UNIQUEMENT sur le contexte "
     "fourni. Réponds en français, de façon claire et pédagogique. Pour toute "
-    "formule mathématique, utilise exclusivement la syntaxe Markdown+LaTeX avec "
-    "des délimiteurs dollar : $...$ pour les formules en ligne et $$...$$ pour "
-    "les formules en bloc. N'utilise JAMAIS la syntaxe \\( ... \\) ou \\[ ... \\]."
+    "formule mathématique, aussi courte soit-elle — même un seul symbole isolé "
+    "comme $\\lambda$, $A$ ou $X$ — utilise exclusivement la syntaxe "
+    "Markdown+LaTeX avec des délimiteurs dollar : $...$ pour les formules en "
+    "ligne et $$...$$ pour les formules en bloc. N'utilise JAMAIS la syntaxe "
+    "\\( ... \\) ou \\[ ... \\], et n'écris JAMAIS un symbole mathématique entre "
+    "parenthèses sans signes dollar : par exemple, n'écris jamais « la matrice "
+    "( A ) » ou « le scalaire ( \\lambda ) » — écris toujours « la matrice $A$ » "
+    "ou « le scalaire $\\lambda$ »."
 )
 
 
@@ -28,7 +33,13 @@ class TutorState(TypedDict):
     question: str
     document_id: str
     part_id: str
-    section_content: str
+    # Chunk ids of the specific lesson on screen within part_id — narrower
+    # than the whole section. May be empty (older client, or none matched),
+    # in which case load_section_node falls back to treating the whole
+    # section as "the lesson", same as before this field existed.
+    lesson_chunk_ids: list[str]
+    lesson_content: str
+    rest_of_section_content: str
     route: str
     context: str
     answer: str
@@ -53,10 +64,25 @@ def build_tutor_graph(session: AsyncSession ,client: AsyncOpenAI):
                 .order_by(DocumentParentChunk.parent_index)
             )
         ).scalars().all()
-        section_text = "\n\n".join(
-            f"[{c.chunk_type} {c.number or ''}]\n{c.content}" for c in chunks
-        )
-        return {"section_content": section_text}
+
+        lesson_ids = set(state["lesson_chunk_ids"])
+        lesson_chunks = [c for c in chunks if str(c.id) in lesson_ids]
+        if not lesson_chunks:
+            # No ids sent, or none matched (stale selection) — fall back to
+            # the whole section as "the lesson" rather than sending nothing.
+            lesson_chunks = chunks
+        lesson_chunk_id_set = {c.id for c in lesson_chunks}
+        rest_chunks = [c for c in chunks if c.id not in lesson_chunk_id_set]
+
+        def render(chunk_list):
+            return "\n\n".join(
+                f"[{c.chunk_type} {c.number or ''}]\n{c.content}" for c in chunk_list
+            )
+
+        return {
+            "lesson_content": render(lesson_chunks),
+            "rest_of_section_content": render(rest_chunks),
+        }
 
     async def classify_node(state: TutorState) -> dict:
         prompt = (
@@ -66,12 +92,12 @@ def build_tutor_graph(session: AsyncSession ,client: AsyncOpenAI):
             "texte ne traite pas explicitement de ce sujet précis, réponds "
             "'corpus', même si la question te semble simple.\n\n"
             "Exception : si la question est une demande générique qui se réfère "
-            "au contenu actuellement affiché plutôt qu'à un sujet précis "
-            "(par exemple « explique cette partie », « résume cette section », "
+            "au passage actuellement affiché plutôt qu'à un sujet précis "
+            "(par exemple « explique cette partie », « résume ce passage », "
             "« reformule ça », « je ne comprends pas ce passage »), réponds "
             "toujours 'section' — une telle question n'a pas de sujet externe à "
             "rechercher, elle porte par définition sur le texte déjà fourni.\n\n"
-            f"Texte de la section actuelle :\n{state['section_content']}\n\n"
+            f"Texte actuellement affiché à l'étudiant :\n{state['lesson_content']}\n\n"
             f"Question de l'étudiant : {state['question']}\n\n"
             "Ce texte aborde-t-il explicitement le sujet de cette question ?"
         )
@@ -112,17 +138,27 @@ def build_tutor_graph(session: AsyncSession ,client: AsyncOpenAI):
         return {"context": context}
 
     async def generate_node(state: TutorState) -> dict:
-        # Even on the corpus branch, keep the current section as grounding —
-        # a misclassified self-referential question ("explique cette partie")
-        # would otherwise lose the current part entirely and get answered
-        # from whatever unrelated chunk the corpus search happened to match.
+        # The lesson on screen is always the primary grounding. The rest of
+        # the section is always included too, but clearly secondary — this
+        # keeps answers precisely scoped to what the student is looking at
+        # instead of treating the whole (now much larger, post-split) section
+        # as equally relevant. Corpus matches, when routed there, are
+        # tertiary — a misclassified self-referential question ("explique
+        # cette partie") still has the lesson and section as a fallback
+        # rather than losing them entirely to an unrelated corpus match.
+        context_parts = [
+            f"Passage actuellement affiché à l'étudiant :\n{state['lesson_content']}"
+        ]
+        if state["rest_of_section_content"]:
+            context_parts.append(
+                f"Reste de la section (contexte complémentaire, moins prioritaire) "
+                f":\n{state['rest_of_section_content']}"
+            )
         if state["route"] == "corpus":
-            context = (
-                f"Section actuellement affichée à l'étudiant :\n{state['section_content']}\n\n"
+            context_parts.append(
                 f"Autres passages du cours pouvant être pertinents :\n{state['context']}"
             )
-        else:
-            context = state["section_content"]
+        context = "\n\n---\n\n".join(context_parts)
         messages = (
             [{"role": "system", "content": SYSTEM_PROMPT}]
             + state["history"]

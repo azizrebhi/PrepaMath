@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
-import { PanelLeft, PanelLeftClose } from "lucide-react";
+import { PanelLeft, X } from "lucide-react";
 import "katex/dist/katex.min.css";
 import { useAuth } from "../../context/AuthContext";
 
@@ -112,30 +112,52 @@ function ChunkContent({ chunk }) {
   );
 }
 
-function PartsList({ parts, selectedPartId, setSelectedPartId }) {
+// Slides in from the right and overlays on top of the whole workspace (the
+// regular page stays visible, dimmed, behind it) rather than pushing content
+// over as an inline column — matches how NeetCode's own problem list panel
+// behaves, which is what this was modeled on.
+function SectionsDrawer({ parts, selectedPartId, setSelectedPartId, onClose }) {
   return (
-    <div className="w-60 flex-shrink-0 border-r border-border-subtle overflow-y-auto">
-      <div className="px-4 py-3 text-sm font-medium text-ink-muted">Sections</div>
-      <div className="pb-2">
-        {parts.map((part, i) => {
-          const active = part.id === selectedPartId;
-          return (
-            <button
-              key={part.id}
-              onClick={() => setSelectedPartId(part.id)}
-              className={`w-full text-left flex gap-2.5 px-4 py-2.5 text-sm leading-snug transition-colors ${
-                active
-                  ? "bg-accent-violet-bg text-accent-violet-text"
-                  : "text-ink-muted hover:bg-surface-raised hover:text-ink"
-              }`}
-            >
-              <span className="text-ink-muted shrink-0">{i + 1}.</span>
-              <span>{part.title}</span>
-            </button>
-          );
-        })}
+    <>
+      <div
+        className="fixed inset-0 z-40 bg-black/60 animate-fade-in"
+        onClick={onClose}
+      />
+      <div className="fixed inset-y-0 right-0 z-50 w-80 max-w-[85vw] bg-canvas border-l border-border-subtle overflow-y-auto shadow-2xl animate-slide-in-right">
+        <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b border-border-subtle">
+          <span className="text-sm font-medium text-ink-muted">Sections</span>
+          <button
+            onClick={onClose}
+            className="text-ink-muted hover:text-ink transition-colors"
+            aria-label="Fermer"
+          >
+            <X size={18} />
+          </button>
+        </div>
+        <div className="pb-2">
+          {parts.map((part, i) => {
+            const active = part.id === selectedPartId;
+            return (
+              <button
+                key={part.id}
+                onClick={() => {
+                  setSelectedPartId(part.id);
+                  onClose();
+                }}
+                className={`w-full text-left flex gap-2.5 px-4 py-2.5 text-sm leading-snug transition-colors ${
+                  active
+                    ? "bg-accent-violet-bg text-accent-violet-text"
+                    : "text-ink-muted hover:bg-surface-raised hover:text-ink"
+                }`}
+              >
+                <span className="text-ink-muted shrink-0">{i + 1}.</span>
+                <span>{part.title}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -183,12 +205,12 @@ function ExercisesModal({ exercises, activeId, setActiveId, onClose }) {
   );
 }
 
-export default function LeftPanel({ selectedPartId, setSelectedPartId }) {
+export default function LeftPanel({ selectedPartId, setSelectedPartId, setCurrentLessonChunkIds }) {
   const { chapterId } = useParams();
   const [parts, setParts] = useState([]);
   const [chunks, setChunks] = useState([]);
   const [lessonIndex, setLessonIndex] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showExercises, setShowExercises] = useState(false);
   const [activeExerciseId, setActiveExerciseId] = useState(null);
   const [loadingParts, setLoadingParts] = useState(true);
@@ -262,6 +284,13 @@ export default function LeftPanel({ selectedPartId, setSelectedPartId }) {
   const lessons = useMemo(() => groupIntoLessons(courseChunks), [courseChunks]);
   const currentLesson = lessons[lessonIndex] ?? [];
 
+  // Tell RightPanel exactly which chunks are on screen — narrower than the
+  // whole part, so questions get answered against the specific lesson
+  // being read rather than the entire (sometimes 30-50 chunk) section.
+  useEffect(() => {
+    setCurrentLessonChunkIds((lessons[lessonIndex] ?? []).map((c) => c.id));
+  }, [lessonIndex, lessons, setCurrentLessonChunkIds]);
+
   if (loadingParts) {
     return <p className="p-6 text-ink-muted text-sm">Chargement...</p>;
   }
@@ -274,18 +303,14 @@ export default function LeftPanel({ selectedPartId, setSelectedPartId }) {
 
   return (
     <div className="relative flex h-full text-ink">
-      {sidebarOpen && (
-        <PartsList parts={parts} selectedPartId={selectedPartId} setSelectedPartId={setSelectedPartId} />
-      )}
-
       <div className="flex-1 flex flex-col min-w-0">
         <div className="flex-shrink-0 flex items-center gap-3 border-b border-border-subtle p-4">
           <button
-            onClick={() => setSidebarOpen((v) => !v)}
+            onClick={() => setSidebarOpen(true)}
             className="flex-shrink-0 text-ink-muted hover:text-ink transition-colors"
-            aria-label={sidebarOpen ? "Masquer les sections" : "Afficher les sections"}
+            aria-label="Afficher les sections"
           >
-            {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
+            <PanelLeft size={18} />
           </button>
 
           <span className="flex-1 min-w-0 text-base font-semibold truncate">{currentPart?.title}</span>
@@ -350,6 +375,15 @@ export default function LeftPanel({ selectedPartId, setSelectedPartId }) {
           activeId={activeExerciseId}
           setActiveId={setActiveExerciseId}
           onClose={() => setShowExercises(false)}
+        />
+      )}
+
+      {sidebarOpen && (
+        <SectionsDrawer
+          parts={parts}
+          selectedPartId={selectedPartId}
+          setSelectedPartId={setSelectedPartId}
+          onClose={() => setSidebarOpen(false)}
         />
       )}
     </div>

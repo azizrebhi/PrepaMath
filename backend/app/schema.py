@@ -13,6 +13,11 @@ class UserCreate(schemas.BaseUserCreate):
 class AskRequest(BaseModel):
     query: str
     current_part_id: UUID
+    # The specific lesson's chunk ids within current_part_id, i.e. what's
+    # actually on screen — narrower than the whole section. Optional so an
+    # older client that doesn't send this still gets the pre-existing
+    # whole-section behavior rather than a validation error.
+    current_chunk_ids: list[UUID] = Field(default_factory=list)
     conversation_id: UUID | None = None
 
 

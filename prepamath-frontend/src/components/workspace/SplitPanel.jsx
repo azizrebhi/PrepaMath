@@ -10,6 +10,7 @@ export default function SplitPanel() {
   const [leftWidth, setLeftWidth] = useState(40); // percent
   const [isDragging, setIsDragging] = useState(false);
   const [selectedPartId, setSelectedPartId] = useState(null);
+  const [currentLessonChunkIds, setCurrentLessonChunkIds] = useState([]);
 
   const handleMouseDown = useCallback((e) => {
     e.preventDefault(); // stops text-selection while dragging
@@ -48,7 +49,11 @@ export default function SplitPanel() {
         style={{ width: `${leftWidth}%` }}
         className="bg-surface border border-border-subtle rounded-lg overflow-y-auto"
       >
-        <LeftPanel selectedPartId={selectedPartId} setSelectedPartId={setSelectedPartId} />
+        <LeftPanel
+          selectedPartId={selectedPartId}
+          setSelectedPartId={setSelectedPartId}
+          setCurrentLessonChunkIds={setCurrentLessonChunkIds}
+        />
       </div>
 
       <div
@@ -59,7 +64,7 @@ export default function SplitPanel() {
       </div>
 
       <div className="flex-1 bg-surface border border-border-subtle rounded-lg overflow-hidden">
-        <RightPanel selectedPartId={selectedPartId} />
+        <RightPanel selectedPartId={selectedPartId} currentLessonChunkIds={currentLessonChunkIds} />
       </div>
     </div>
   );
