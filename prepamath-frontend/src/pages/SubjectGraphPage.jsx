@@ -15,13 +15,11 @@ export default function SubjectGraphPage() {
   const { subject } = useParams();
   const graph = GRAPHS_BY_SLUG[subject];
   const [documents, setDocuments] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const apiFetch = useApiFetch();
 
   useEffect(() => {
     async function fetchDocuments() {
-      setLoading(true);
       setError(null);
       try {
         const res = await apiFetch(`${API_BASE_URL}/documents`);
@@ -32,8 +30,6 @@ export default function SubjectGraphPage() {
         setDocuments(data);
       } catch (err) {
         setError(err.message);
-      } finally {
-        setLoading(false);
       }
     }
 
@@ -45,8 +41,16 @@ export default function SubjectGraphPage() {
   }
 
   return (
-    <div className="h-full flex flex-col text-ink">
-      <div className="flex-shrink-0 flex items-center gap-2 p-4">
+    <div className="relative h-full text-ink">
+      {/* The graph's own canvas spans the full page — its dot background
+          pans and zooms together with the nodes, which is what makes
+          panning feel continuous instead of the content clipping against a
+          static backdrop that doesn't move with it. */}
+      <div className="absolute inset-0">
+        <ChapterGraphView graph={graph} documents={documents} />
+      </div>
+
+      <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
         {Object.entries(GRAPHS_BY_SLUG).map(([slug, g]) => (
           <Link
             key={slug}
@@ -62,15 +66,10 @@ export default function SubjectGraphPage() {
         ))}
       </div>
 
-      {loading && <p className="p-4 text-ink-muted text-sm">Chargement...</p>}
       {error && (
-        <p className="p-4 text-accent-red-text text-sm">Échec du chargement des chapitres : {error}</p>
-      )}
-
-      {!loading && !error && (
-        <div className="flex-1 min-h-0">
-          <ChapterGraphView graph={graph} documents={documents} />
-        </div>
+        <p className="absolute top-4 right-4 z-10 text-sm text-accent-red-text bg-surface border border-border-subtle rounded-md px-3 py-1.5">
+          Échec du chargement des chapitres : {error}
+        </p>
       )}
     </div>
   );

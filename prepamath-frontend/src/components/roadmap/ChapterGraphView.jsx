@@ -152,7 +152,7 @@ export default function ChapterGraphView({ graph, documents }) {
         proOptions={{ hideAttribution: false }}
         style={{ background: "var(--color-canvas)" }}
       >
-        <Background color="rgba(255, 255, 255, 0.25)" gap={24} size={1} />
+        <Background color="rgba(255, 255, 255, 0.5)" gap={24} size={1} />
       </ReactFlow>
     </div>
   );

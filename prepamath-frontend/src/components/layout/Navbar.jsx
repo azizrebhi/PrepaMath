@@ -36,7 +36,7 @@ export default function Navbar() {
       >
       <div className="flex items-center gap-x-8">
         <Link to="/" className="flex items-center gap-x-2">
-          <img src={kernelLogo} alt="" className="h-7 w-7 object-contain" />
+          <img src={kernelLogo} alt="" className="h-9 w-9 object-contain" />
           <span className="font-semibold tracking-tight">Kernel</span>
         </Link>
 

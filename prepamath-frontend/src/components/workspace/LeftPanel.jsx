@@ -38,7 +38,12 @@ function groupIntoLessons(chunks) {
 function stripRedundantHeadings(content, chunkType, number) {
   const escType = chunkType.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const escNumber = number ? number.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") : "";
-  const headingPattern = `#{0,3}\\s*\\*{0,3}\\s*${escType}s?\\s*${escNumber}\\s*\\*{0,3}`;
+  // The source sometimes names the statement in a parenthetical right after
+  // the number ("Corollaire 3 (Traduction matricielle de la stabilité)") —
+  // without this, that whole heading line survives untouched (nothing after
+  // the number matches), showing up as a visible duplicate of the type+number
+  // badge already rendered above it.
+  const headingPattern = `#{0,3}\\s*\\*{0,3}\\s*${escType}s?\\s*${escNumber}(?:\\s*\\([^)]*\\))?\\s*\\*{0,3}`;
 
   let cleaned = content.replace(
     new RegExp(`^(?:p\\.\\d+\\s+)?${headingPattern}\\s*\\n+`, "i"),
@@ -91,8 +96,12 @@ function stripRunningHeaderArtifacts(content) {
 // "--- Solution (Proposition 1) ---" reads as plain body text otherwise —
 // promote it to a real heading so typography actually sets it apart, and
 // drop the "(Type N)" repeat since the badge above already says what this is.
-function styleSolutionMarker(content) {
-  return content.replace(/---\s*Solution\s*\([^)]*\)\s*---/gi, "\n#### Solution\n");
+// Exercices have "solutions"; Propositions/Corollaires/Théorèmes/Lemmes have
+// "démonstrations" (proofs) — the merged-in text is the same mechanism
+// either way, but the correct French math term depends on which one this is.
+function styleSolutionMarker(content, chunkType) {
+  const heading = chunkType === "Exercice" ? "Solution" : "Démonstration";
+  return content.replace(/---\s*Solution\s*\([^)]*\)\s*---/gi, `\n#### ${heading}\n`);
 }
 
 // Définitions, Corollaires and Propositions already get Tailwind Typography's
@@ -133,14 +142,14 @@ function cleanChunkContent(content, chunkType, number) {
   cleaned = stripRunningHeaderArtifacts(cleaned);
   cleaned = fixDisplayOnlyTags(cleaned);
   cleaned = blockquoteStatement(cleaned, chunkType);
-  cleaned = styleSolutionMarker(cleaned);
+  cleaned = styleSolutionMarker(cleaned, chunkType);
   return cleaned;
 }
 
 function ChunkContent({ chunk }) {
   const label = chunk.number ? `${chunk.chunk_type} ${chunk.number}` : chunk.chunk_type;
   return (
-    <div className="prose prose-invert max-w-none prose-p:text-ink prose-li:text-ink prose-strong:text-ink prose-headings:text-ink prose-h4:text-accent-green-text prose-h4:text-sm prose-h4:font-semibold prose-h4:mt-6 prose-h4:mb-2">
+    <div className="prose prose-lg prose-invert max-w-none overflow-x-auto prose-p:text-ink prose-p:leading-relaxed prose-p:my-4 prose-li:text-ink prose-li:leading-relaxed prose-strong:text-ink prose-headings:text-ink prose-blockquote:leading-relaxed prose-blockquote:my-4 prose-h4:text-accent-amber-text prose-h4:text-xl prose-h4:font-bold prose-h4:leading-snug prose-h4:mt-10 prose-h4:mb-4 prose-h4:pt-6 prose-h4:border-t prose-h4:border-border-subtle">
       <span className="block text-xl font-bold text-accent-amber-text mb-2">
         {label}
       </span>
@@ -374,7 +383,7 @@ export default function LeftPanel({ selectedPartId, setSelectedPartId, setCurren
           )}
 
           {!loadingChunks && lessons.length > 0 && (
-            <div className="space-y-8 max-w-2xl">
+            <div className="space-y-8">
               {currentLesson.map((chunk) => (
                 <ChunkContent key={chunk.id} chunk={chunk} />
               ))}

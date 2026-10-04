@@ -27,6 +27,10 @@
   --color-accent-green-text: #2cbb5d;
   --color-accent-violet-bg: #2c2a42;
   --color-accent-violet-text: #8c7cf0;
+  /* A lighter, more saturated tint of the navy canvas — distinct from the
+     violet used for "selected" states in navigation, so the user's own chat
+     bubble reads as its own thing rather than reusing that same meaning. */
+  --color-accent-blue-bg: #38456b;
   --color-accent-red-bg: #3a1f1f;
   --color-accent-red-text: #e5534b;
 }
@@ -62,4 +66,14 @@ body {
 
 .animate-fade-in {
   animation: fade-in 0.22s ease-out;
+}
+
+/* An inline formula ($...$) sitting mid-sentence is just another span to the
+   browser's line-wrapping — if it doesn't fit, it splits it internally,
+   which can cut a matrix or a parenthesized expression right in half across
+   two lines. nowrap forces the whole formula to move to the next line as one
+   unit instead. Doesn't affect $$...$$ display blocks (those are already
+   block-level, not wrapped inline with surrounding text). */
+.katex {
+  white-space: nowrap;
 }

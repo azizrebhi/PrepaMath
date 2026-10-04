@@ -121,7 +121,7 @@ export default function RightPanel({ selectedPartId, currentLessonChunkIds }) {
             key={i}
             className={`p-4 rounded-md border text-base ${
               m.role === "user"
-                ? "bg-accent-violet-bg border-accent-violet-bg ml-8"
+                ? "bg-accent-blue-bg border-accent-blue-bg ml-8"
                 : "bg-surface border-border-subtle mr-8"
             }`}
           >

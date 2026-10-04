@@ -38,7 +38,7 @@ export default function WorkspacePreview() {
           KernelBot
         </div>
         <div className="flex-1 overflow-hidden p-4 space-y-3">
-          <div className="p-3 rounded-md border bg-accent-violet-bg border-accent-violet-bg ml-8 text-sm text-ink">
+          <div className="p-3 rounded-md border bg-accent-blue-bg border-accent-blue-bg ml-8 text-sm text-ink">
             Pourquoi la matrice est diagonale par blocs ici ?
           </div>
           <div className="p-3 rounded-md border bg-surface border-border-subtle mr-8 text-sm">
