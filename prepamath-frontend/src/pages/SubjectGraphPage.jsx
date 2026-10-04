@@ -45,8 +45,8 @@ export default function SubjectGraphPage() {
   }
 
   return (
-    <div className="h-full overflow-y-auto p-8 text-ink">
-      <div className="flex items-center gap-2 mb-6">
+    <div className="h-full flex flex-col text-ink">
+      <div className="flex-shrink-0 flex items-center gap-2 p-4">
         {Object.entries(GRAPHS_BY_SLUG).map(([slug, g]) => (
           <Link
             key={slug}
@@ -62,12 +62,16 @@ export default function SubjectGraphPage() {
         ))}
       </div>
 
-      {loading && <p className="text-ink-muted text-sm">Chargement...</p>}
+      {loading && <p className="p-4 text-ink-muted text-sm">Chargement...</p>}
       {error && (
-        <p className="text-accent-red-text text-sm">Échec du chargement des chapitres : {error}</p>
+        <p className="p-4 text-accent-red-text text-sm">Échec du chargement des chapitres : {error}</p>
       )}
 
-      {!loading && !error && <ChapterGraphView graph={graph} documents={documents} />}
+      {!loading && !error && (
+        <div className="flex-1 min-h-0">
+          <ChapterGraphView graph={graph} documents={documents} />
+        </div>
+      )}
     </div>
   );
 }

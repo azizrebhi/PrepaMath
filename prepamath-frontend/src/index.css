@@ -5,23 +5,24 @@
   --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", monospace;
 
-  /* Dark palette extracted directly from the NeetCode reference screenshots:
-     near-black page canvas, a slightly-lighter raised surface for cards/
-     panels, and three semantic accents actually present in the source
-     (amber for brand/emphasis, green for success, violet for the
-     "currently selected" state seen on the highlighted problem row).
-     Canvas is also what AppShell/Navbar use (bg-canvas), so the page
-     background and the gap/border around the workspace panels stay the
-     same color — change it here and both follow. */
-  --color-canvas: #1d1c1e;
-  --color-surface: #242426;
-  --color-surface-raised: #2a2a2d;
-  --color-border-subtle: #333335;
+  /* Palette built from three given colors (#202332 navy canvas, #8b95a0
+     muted ink, #bb9974 warm accent) — these three are used as-is for canvas,
+     ink-muted, and the amber accent below. Surface/surface-raised/
+     border-subtle aren't among the three given, so they're derived as
+     lighter navy tints of the same #202332 hue rather than left as the old
+     neutral grays, so the whole palette still reads as one family. Canvas
+     is also what AppShell/Navbar use (bg-canvas), so the page background
+     and the gap/border around the workspace panels stay in sync — change
+     it here and both follow. */
+  --color-canvas: #202332;
+  --color-surface: #2a2e42;
+  --color-surface-raised: #333a52;
+  --color-border-subtle: #3a4059;
   --color-ink: #ededed;
-  --color-ink-muted: #8a8a8e;
+  --color-ink-muted: #8b95a0;
 
-  --color-accent-amber-bg: #4a3319;
-  --color-accent-amber-text: #ffa116;
+  --color-accent-amber-bg: #3d3326;
+  --color-accent-amber-text: #bb9974;
   --color-accent-green-bg: #1c3a26;
   --color-accent-green-text: #2cbb5d;
   --color-accent-violet-bg: #2c2a42;

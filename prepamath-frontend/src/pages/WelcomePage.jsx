@@ -1,39 +1,41 @@
 import { Link } from "react-router-dom";
-import kernelLogo from "../assets/kernel.png";
+import WorkspacePreview from "../components/marketing/WorkspacePreview";
+import ChapterGraphView from "../components/roadmap/ChapterGraphView";
+import { ALGEBRE_GRAPH } from "../data/chapterGraphs";
 
 export default function WelcomePage() {
   return (
     <div className="h-full overflow-y-auto">
-      <div className="max-w-6xl mx-auto px-6 py-20 flex flex-col md:flex-row items-center gap-16">
-        <div className="flex-1 max-w-xl">
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight leading-[1.05]">
-            Une meilleure façon de
-            <br />
-            <span className="text-violet-400">réviser tes maths de prépa.</span>
-          </h1>
+      <div className="max-w-5xl mx-auto px-6 py-20">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1] max-w-3xl">
+          Pose ta question sur cette leçon — pas sur un cours générique.
+        </h1>
 
-          <p className="mt-6 text-neutral-400 text-lg leading-relaxed">
-            Des explications générées par IA, fondées sur ton propre cours —
-            de l'algèbre linéaire à la topologie, pensé pour les classes
-            préparatoires.
-          </p>
+        <p className="mt-6 text-ink-muted text-lg leading-relaxed max-w-2xl">
+          Réduction des endomorphismes, espaces vectoriels normés, et la suite
+          du programme MP — un tuteur qui répond à partir de la leçon
+          affichée à l'écran, pas d'un vague résumé du chapitre.
+        </p>
 
-          <Link
-            to="/chapters"
-            className="inline-block mt-8 px-6 py-3 rounded-lg bg-violet-600 hover:bg-violet-500 text-white font-medium transition-colors"
-          >
-            Voir les chapitres
-          </Link>
+        <Link
+          to="/chapters"
+          className="inline-block mt-8 px-6 py-3 rounded-lg bg-accent-amber-text text-[#18181a] font-medium hover:bg-[#a3835f] transition-colors"
+        >
+          Voir les chapitres
+        </Link>
+
+        <div className="mt-16">
+          <WorkspacePreview />
         </div>
 
-        <div className="flex-1 flex items-center justify-center">
-          <div className="relative">
-            <div className="absolute inset-0 bg-violet-600/30 blur-3xl rounded-full" />
-            <img
-              src={kernelLogo}
-              alt="Kernel"
-              className="relative w-64 h-64 md:w-80 md:h-80 object-contain"
-            />
+        <div className="mt-24">
+          <h2 className="text-2xl font-semibold text-ink">Construit sur le vrai programme</h2>
+          <p className="mt-2 text-ink-muted max-w-2xl">
+            Chaque chapitre est relié à ceux dont il dépend réellement —
+            pas une simple liste chronologique.
+          </p>
+          <div className="mt-6 h-[420px] rounded-xl border border-border-subtle overflow-hidden">
+            <ChapterGraphView graph={ALGEBRE_GRAPH} documents={[]} />
           </div>
         </div>
       </div>

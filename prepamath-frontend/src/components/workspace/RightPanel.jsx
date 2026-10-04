@@ -167,7 +167,7 @@ export default function RightPanel({ selectedPartId, currentLessonChunkIds }) {
           <button
             type="submit"
             disabled={loading || loadingHistory || !input.trim() || !selectedPartId}
-            className="bg-accent-amber-text text-[#18181a] font-medium px-4 py-2 rounded-md text-sm hover:bg-[#e6910d] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="bg-accent-amber-text text-[#18181a] font-medium px-4 py-2 rounded-md text-sm hover:bg-[#a3835f] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Envoyer
           </button>

@@ -20,6 +20,11 @@ class User(SQLAlchemyBaseUserTableUUID,Base):
     oauth_accounts: Mapped[list[OauthAccount]]=relationship(
         "OauthAccount",lazy="joined"
     )
+    # Only ever populated for Google sign-ins (see UserManager.oauth_callback
+    # in auth.py) — httpx_oauth's GoogleOAuth2.get_id_email only requests/
+    # returns email, so the profile picture needs its own separate fetch
+    # against Google's userinfo endpoint. Null for email/password accounts.
+    picture: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
 
 class Document(Base):

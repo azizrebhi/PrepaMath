@@ -12,7 +12,7 @@ const ROW_GAP = 70;
 // yet to justify differentiating by depth, so availability is signaled with
 // a small label instead. Only the subject node (added above the graph's own
 // roots) keeps the amber brand accent, to set it apart as the graph's title.
-const CHAPTER_COLOR = { bg: "#4c517f", text: "#e4e5f5" };
+const CHAPTER_COLOR = { bg: "#bb9974", text: "#18181a" };
 const SUBJECT_COLOR = { bg: "var(--color-accent-amber-bg)", text: "var(--color-accent-amber-text)" };
 
 function ChapterNode({ data }) {
@@ -135,11 +135,8 @@ export default function ChapterGraphView({ graph, documents }) {
     }
   }
 
-  const maxRow = Math.max(...graph.nodes.map((n) => n.row));
-  const height = (maxRow + 2) * (CELL_HEIGHT + ROW_GAP) + 40;
-
   return (
-    <div style={{ height }} className="rounded-xl border border-border-subtle overflow-hidden">
+    <div className="h-full w-full">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -153,9 +150,9 @@ export default function ChapterGraphView({ graph, documents }) {
         fitView
         fitViewOptions={{ padding: 0.15 }}
         proOptions={{ hideAttribution: false }}
-        style={{ background: "var(--color-surface)" }}
+        style={{ background: "var(--color-canvas)" }}
       >
-        <Background color="var(--color-border-subtle)" gap={24} size={1} />
+        <Background color="rgba(255, 255, 255, 0.25)" gap={24} size={1} />
       </ReactFlow>
     </div>
   );

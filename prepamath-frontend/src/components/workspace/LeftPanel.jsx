@@ -357,7 +357,7 @@ export default function LeftPanel({ selectedPartId, setSelectedPartId, setCurren
                 setShowExercises(true);
                 setActiveExerciseId(exerciseChunks[0].id);
               }}
-              className="flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-md bg-accent-amber-text text-[#18181a] hover:bg-[#e6910d] transition-colors whitespace-nowrap"
+              className="flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-md bg-accent-amber-text text-[#18181a] hover:bg-[#a3835f] transition-colors whitespace-nowrap"
             >
               Exercices ({exerciseChunks.length})
             </button>

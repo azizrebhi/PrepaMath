@@ -5,9 +5,12 @@ from fastapi_users import schemas
 
 
 class UserRead(schemas.BaseUser[UUID]):
-    pass
+    picture: str | None = None
 
 class UserCreate(schemas.BaseUserCreate):
+    pass
+
+class UserUpdate(schemas.BaseUserUpdate):
     pass
 
 class AskRequest(BaseModel):

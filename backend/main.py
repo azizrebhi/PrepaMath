@@ -10,7 +10,7 @@ from slowapi.middleware import SlowAPIMiddleware
 
 from app.auth import fastapi_users ,auth_backend, google_oauth_client, SECRET
 from app.rate_limit import limiter
-from app.schema import UserRead , UserCreate
+from app.schema import UserRead , UserCreate, UserUpdate
 from app.routers import answer, chapters, retrieval
 
 @asynccontextmanager
@@ -61,6 +61,7 @@ app.include_router(fastapi_users.get_oauth_router(
 )
 app.include_router(fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"])
 app.include_router(fastapi_users.get_register_router(UserRead, UserCreate), prefix="/auth", tags=["auth"])
+app.include_router(fastapi_users.get_users_router(UserRead, UserUpdate), prefix="/users", tags=["users"])
 app.include_router(retrieval.router)
 app.include_router(chapters.router)
 app.include_router(answer.router)
