@@ -63,8 +63,14 @@ function fixDisplayOnlyTags(content) {
 // "Démonstration page 108" is a page pointer into the physical textbook —
 // meaningless here since nothing is paginated, so it's dropped entirely
 // (but "Démonstration non exigible", which is real content, is left alone).
+// Two shapes show up in the source: standalone on its own line, and inline
+// in brackets right after "Principe de démonstration." — e.g. "Principe de
+// démonstration. [Démonstration page 109]" — the bracketed form needs a
+// non-line-anchored match since it shares a line with real content before it.
 function stripPageReferences(content) {
-  return content.replace(/^\s*\*{0,2}Démonstration\*{0,2}\s+page\s+\d+\.?\s*$/gim, "");
+  let cleaned = content.replace(/^\s*\*{0,2}Démonstration\*{0,2}\s+page\s+\d+\.?\s*$/gim, "");
+  cleaned = cleaned.replace(/\[\s*Démonstration\s+page\s+\d+\s*\]/gi, "");
+  return cleaned;
 }
 
 // A chapter-section running header ("I Généralités", "*I Sous-espaces...*")
@@ -89,11 +95,44 @@ function styleSolutionMarker(content) {
   return content.replace(/---\s*Solution\s*\([^)]*\)\s*---/gi, "\n#### Solution\n");
 }
 
+// Définitions, Corollaires and Propositions already get Tailwind Typography's
+// native blockquote left-bar styling — but only when the source happened to
+// wrap the statement in "> " markdown, which is inconsistent (e.g. most
+// Propositions don't, even though Définitions usually do). Rather than
+// adding a second, different-looking rule, make the existing one apply
+// uniformly: if the statement isn't already quoted, quote it ourselves —
+// just the formal claim itself, stopping before any proof sketch
+// ("Principe de démonstration...") or merged-in solution.
+const HIGHLIGHTED_TYPES = new Set(["Définition", "Corollaire", "Proposition"]);
+
+function blockquoteStatement(content, chunkType) {
+  if (!HIGHLIGHTED_TYPES.has(chunkType)) return content;
+  if (/^\s*>/.test(content)) return content; // already quoted by the source
+
+  const cutoffPatterns = [/Principe de démonstration/i, /Démonstration(?!s)[.\s]/i, /---\s*Solution\s*\(/i];
+  const cutoffIndex = cutoffPatterns
+    .map((re) => content.search(re))
+    .filter((i) => i !== -1)
+    .reduce((min, i) => Math.min(min, i), content.length);
+
+  const statement = content.slice(0, cutoffIndex);
+  const rest = content.slice(cutoffIndex);
+  if (!statement.trim()) return content;
+
+  const quoted = statement
+    .split("\n")
+    .map((line) => (line.trim() ? `> ${line}` : ">"))
+    .join("\n");
+
+  return `${quoted}\n${rest}`;
+}
+
 function cleanChunkContent(content, chunkType, number) {
   let cleaned = stripRedundantHeadings(content, chunkType, number);
   cleaned = stripPageReferences(cleaned);
   cleaned = stripRunningHeaderArtifacts(cleaned);
   cleaned = fixDisplayOnlyTags(cleaned);
+  cleaned = blockquoteStatement(cleaned, chunkType);
   cleaned = styleSolutionMarker(cleaned);
   return cleaned;
 }
@@ -102,7 +141,7 @@ function ChunkContent({ chunk }) {
   const label = chunk.number ? `${chunk.chunk_type} ${chunk.number}` : chunk.chunk_type;
   return (
     <div className="prose prose-invert max-w-none prose-p:text-ink prose-li:text-ink prose-strong:text-ink prose-headings:text-ink prose-h4:text-accent-green-text prose-h4:text-sm prose-h4:font-semibold prose-h4:mt-6 prose-h4:mb-2">
-      <span className="inline-block text-sm font-medium text-accent-amber-text mb-2">
+      <span className="block text-xl font-bold text-accent-amber-text mb-2">
         {label}
       </span>
       <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>

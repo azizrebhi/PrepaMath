@@ -106,7 +106,7 @@ export default function RightPanel({ selectedPartId, currentLessonChunkIds }) {
   return (
     <div className="flex flex-col h-full text-ink">
       <div className="flex-shrink-0 flex items-center justify-between border-b border-border-subtle p-4">
-        <span className="font-semibold text-base">Tuteur IA</span>
+        <span className="font-semibold text-base">KernelBot</span>
         <span className="text-sm text-ink-muted">
           {loading ? "Réflexion en cours..." : "Statut : actif"}
         </span>
