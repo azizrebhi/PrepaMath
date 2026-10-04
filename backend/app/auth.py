@@ -37,7 +37,11 @@ async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db
 bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=SECRET, lifetime_seconds=3600)
+    # 30 days. This is a single-token stopgap, not real refresh-token
+    # rotation (no separate short-lived access token + long-lived refresh
+    # token here) — see the 401 handling in AuthContext.jsx for what makes
+    # an eventual expiry non-jarring regardless of this value.
+    return JWTStrategy(secret=SECRET, lifetime_seconds=60 * 60 * 24 * 30)
 
 auth_backend = AuthenticationBackend(
         name="jwt",

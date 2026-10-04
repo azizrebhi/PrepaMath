@@ -4,8 +4,12 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 from app.auth import fastapi_users ,auth_backend, google_oauth_client, SECRET
+from app.rate_limit import limiter
 from app.schema import UserRead , UserCreate
 from app.routers import answer, chapters, retrieval
 
@@ -16,6 +20,10 @@ async def lifespan(app: FastAPI):
     print("Shutting down...")
 
 app = FastAPI(lifespan=lifespan)
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 
 # TEMPORARY — remove once the Google OAuth 500 is diagnosed. Forces the real

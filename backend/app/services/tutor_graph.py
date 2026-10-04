@@ -44,6 +44,12 @@ class TutorState(TypedDict):
     context: str
     answer: str
     history: Annotated[list, operator.add]
+    # Three different OpenAI calls can happen per question (classify, the
+    # corpus embedding, generate) — each node reports only its own usage,
+    # and operator.add sums them across however many of the three actually
+    # ran, the same way `history` already accumulates across nodes.
+    prompt_tokens: Annotated[int, operator.add]
+    completion_tokens: Annotated[int, operator.add]
 
 
 def build_tutor_graph(session: AsyncSession ,client: AsyncOpenAI):
@@ -121,7 +127,11 @@ def build_tutor_graph(session: AsyncSession ,client: AsyncOpenAI):
             },
         )
         decision = json.loads(completion.choices[0].message.content)
-        return {"route": decision["route"]}
+        return {
+            "route": decision["route"],
+            "prompt_tokens": completion.usage.prompt_tokens,
+            "completion_tokens": completion.usage.completion_tokens,
+        }
 
     async def corpus_retrieval_node(state: TutorState) -> dict:
         result = await run_pipeline(
@@ -135,7 +145,8 @@ def build_tutor_graph(session: AsyncSession ,client: AsyncOpenAI):
             document_id=state["document_id"],
         )
         context = "\n\n---\n\n".join(r.content for r in result.results)
-        return {"context": context}
+        # Embeddings have no "completion" side — the whole cost is input.
+        return {"context": context, "prompt_tokens": result.embedding_tokens}
 
     async def generate_node(state: TutorState) -> dict:
         # The lesson on screen is always the primary grounding. The rest of
@@ -170,7 +181,12 @@ def build_tutor_graph(session: AsyncSession ,client: AsyncOpenAI):
             {"role": "user", "content": state["question"]},
             {"role": "assistant", "content": answer},
         ]
-        return {"answer": answer, "history": new_turn}
+        return {
+            "answer": answer,
+            "history": new_turn,
+            "prompt_tokens": completion.usage.prompt_tokens,
+            "completion_tokens": completion.usage.completion_tokens,
+        }
 
     def route_after_classify(state: TutorState) -> str:
         return state["route"]

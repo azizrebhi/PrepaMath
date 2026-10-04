@@ -67,6 +67,9 @@ class CandidateTrace:
 class PipelineResult:
     results: list[RetrievedChunk]
     candidates: dict[str, CandidateTrace] = field(default_factory=dict)
+    # Embeddings are billed as pure input — there's no "completion" side to
+    # an embedding call — so this is the whole cost of this pipeline run.
+    embedding_tokens: int = 0
 
 
 async def run_pipeline(
@@ -141,6 +144,7 @@ async def run_pipeline(
     # 2. SEMANTIC SEARCH
     # ============================================================
     semantic_rows = []
+    embedding_tokens = 0
     if use_semantic:
         response = await client.embeddings.create(
             model=EMBEDDING_MODEL,
@@ -148,6 +152,7 @@ async def run_pipeline(
             dimensions=EMBEDDING_DIMENSION,
         )
         query_embedding = response.data[0].embedding
+        embedding_tokens = response.usage.total_tokens
         sem_distance = DocumentChunk.embedding.cosine_distance(query_embedding)
 
         semantic_stmt = (
@@ -272,4 +277,8 @@ async def run_pipeline(
             )
         )
 
-    return PipelineResult(results=results, candidates=candidates if trace else {})
+    return PipelineResult(
+        results=results,
+        candidates=candidates if trace else {},
+        embedding_tokens=embedding_tokens,
+    )

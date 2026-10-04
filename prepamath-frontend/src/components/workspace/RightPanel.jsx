@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
-import { useAuth } from "../../context/AuthContext";
+import { useApiFetch } from "../../context/AuthContext";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -24,7 +24,7 @@ export default function RightPanel({ selectedPartId, currentLessonChunkIds }) {
   const [error, setError] = useState(null);
   const [conversationId, setConversationId] = useState(null);
   const [loadingHistory, setLoadingHistory] = useState(true);
-  const { token } = useAuth();
+  const apiFetch = useApiFetch();
 
   // A conversation belongs to one chapter — restore it from the backend
   // (messages were already being persisted there; nothing was ever fetching
@@ -37,9 +37,7 @@ export default function RightPanel({ selectedPartId, currentLessonChunkIds }) {
     async function loadConversation() {
       setLoadingHistory(true);
       try {
-        const res = await fetch(`${API_BASE_URL}/documents/${chapterId}/conversation`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await apiFetch(`${API_BASE_URL}/documents/${chapterId}/conversation`);
         if (!res.ok) {
           throw new Error(`Échec de la requête : ${res.status}`);
         }
@@ -61,7 +59,7 @@ export default function RightPanel({ selectedPartId, currentLessonChunkIds }) {
     return () => {
       cancelled = true;
     };
-  }, [chapterId, token]);
+  }, [chapterId, apiFetch]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -74,12 +72,9 @@ export default function RightPanel({ selectedPartId, currentLessonChunkIds }) {
     setError(null);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/documents/${chapterId}/ask`, {
+      const res = await apiFetch(`${API_BASE_URL}/documents/${chapterId}/ask`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           query,
           current_part_id: selectedPartId,

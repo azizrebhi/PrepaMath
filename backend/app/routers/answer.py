@@ -1,14 +1,16 @@
 import os
 import uuid
+from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from openai import AsyncOpenAI
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import current_active_user
 from app.database import get_async_session
 from app.model import Conversation, Message, User
+from app.rate_limit import limiter
 from app.schema import AskRequest, AskResponse, ConversationOut, MessageOut
 from app.services.tutor_graph import build_tutor_graph
 
@@ -19,6 +21,15 @@ router = APIRouter(
     prefix="/documents/{document_id}",
     tags=["answer"],
 )
+
+# Sized for a real student, not for abuse: a typical exchange here runs
+# roughly 2-6k tokens (lesson + rest-of-section context + the answer) at
+# gpt-4o-mini pricing (~$0.15/1M input, $0.60/1M output) — call it ~$0.002
+# per question on the expensive end. 200k tokens/day is ~30-50 real
+# questions for one student, while capping any single user's worst-case
+# daily exposure at well under $1. Tune this against your own measured
+# average cost per question once you have real usage, not this estimate.
+DAILY_TOKEN_BUDGET = 200_000
 
 
 @router.get("/conversation", response_model=ConversationOut)
@@ -57,12 +68,31 @@ async def get_latest_conversation(
 
 
 @router.post("/ask", response_model=AskResponse)
+@limiter.limit("10/minute")
 async def ask_question(
+    request: Request,
     document_id: uuid.UUID,
     payload: AskRequest,
     session: AsyncSession = Depends(get_async_session),
     user: User = Depends(current_active_user),
 ):
+    # Checked first, before touching the conversation or spending anything —
+    # a rolling 24h window (not "since midnight") so it can't be reset early
+    # by waiting for a clock boundary.
+    window_start = datetime.now(timezone.utc) - timedelta(hours=24)
+    tokens_used_today = (
+        await session.execute(
+            select(func.coalesce(func.sum(Message.prompt_tokens + Message.completion_tokens), 0))
+            .join(Conversation, Conversation.id == Message.conversation_id)
+            .where(Conversation.user_id == user.id, Message.created_at >= window_start)
+        )
+    ).scalar_one()
+    if tokens_used_today >= DAILY_TOKEN_BUDGET:
+        raise HTTPException(
+            status_code=429,
+            detail="Limite quotidienne de questions atteinte. Réessaie demain.",
+        )
+
     if payload.conversation_id is not None:
         conversation = (
             await session.execute(
@@ -101,11 +131,19 @@ async def ask_question(
         "context": "",
         "answer": "",
         "history": history,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
     })
 
     session.add_all([
         Message(conversation_id=conversation.id, role="user", content=payload.query),
-        Message(conversation_id=conversation.id, role="assistant", content=result["answer"]),
+        Message(
+            conversation_id=conversation.id,
+            role="assistant",
+            content=result["answer"],
+            prompt_tokens=result["prompt_tokens"],
+            completion_tokens=result["completion_tokens"],
+        ),
     ])
     await session.commit()
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -11,6 +11,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const sessionExpired = location.state?.sessionExpired;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -50,6 +52,12 @@ export default function LoginPage() {
     <div className="h-full flex items-center justify-center">
       <div className="w-full max-w-sm p-8 rounded-lg border border-neutral-800 bg-neutral-900">
         <h1 className="text-2xl font-semibold text-center">Connexion</h1>
+
+        {sessionExpired && (
+          <p className="mt-4 text-sm text-amber-400 bg-amber-950/40 border border-amber-900 rounded-md px-3 py-2">
+            Votre session a expiré — veuillez vous reconnecter.
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>

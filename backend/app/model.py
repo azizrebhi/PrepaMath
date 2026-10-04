@@ -179,6 +179,14 @@ UUID(as_uuid=True), ForeignKey("conversation.id"), nullable=False, index=True )
 
     role: Mapped[str] = mapped_column(String(20), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
+
+    # Only ever set on the assistant's row — the real cost of an exchange is
+    # everything the three possible OpenAI calls (classify, embedding,
+    # generate) used to produce that answer. The user's own row stays 0;
+    # their question text is already counted inside generate's prompt_tokens.
+    prompt_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    completion_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),

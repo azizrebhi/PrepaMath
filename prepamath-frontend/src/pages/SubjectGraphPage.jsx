@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useApiFetch } from "../context/AuthContext";
 import ChapterGraphView from "../components/roadmap/ChapterGraphView";
 import { ALGEBRE_GRAPH, ANALYSE_GRAPH } from "../data/chapterGraphs";
 
@@ -17,16 +17,14 @@ export default function SubjectGraphPage() {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { token } = useAuth();
+  const apiFetch = useApiFetch();
 
   useEffect(() => {
     async function fetchDocuments() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE_URL}/documents`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await apiFetch(`${API_BASE_URL}/documents`);
         if (!res.ok) {
           throw new Error(`Échec de la requête : ${res.status}`);
         }
@@ -40,7 +38,7 @@ export default function SubjectGraphPage() {
     }
 
     fetchDocuments();
-  }, [token]);
+  }, [apiFetch]);
 
   if (!graph) {
     return <p className="p-8 text-accent-red-text text-sm">Matière inconnue : {subject}</p>;

@@ -5,7 +5,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { PanelLeft, X } from "lucide-react";
 import "katex/dist/katex.min.css";
-import { useAuth } from "../../context/AuthContext";
+import { useApiFetch } from "../../context/AuthContext";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -255,16 +255,14 @@ export default function LeftPanel({ selectedPartId, setSelectedPartId, setCurren
   const [loadingParts, setLoadingParts] = useState(true);
   const [loadingChunks, setLoadingChunks] = useState(false);
   const [error, setError] = useState(null);
-  const { token } = useAuth();
+  const apiFetch = useApiFetch();
 
   useEffect(() => {
     async function fetchParts() {
       setLoadingParts(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE_URL}/documents/${chapterId}/parts`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await apiFetch(`${API_BASE_URL}/documents/${chapterId}/parts`);
         if (!res.ok) {
           throw new Error(`Échec de la requête : ${res.status}`);
         }
@@ -281,7 +279,7 @@ export default function LeftPanel({ selectedPartId, setSelectedPartId, setCurren
     }
 
     fetchParts();
-  }, [chapterId, token]);
+  }, [chapterId, apiFetch]);
 
   useEffect(() => {
     if (!selectedPartId) return;
@@ -290,9 +288,8 @@ export default function LeftPanel({ selectedPartId, setSelectedPartId, setCurren
       setLoadingChunks(true);
       setError(null);
       try {
-        const res = await fetch(
-          `${API_BASE_URL}/documents/${chapterId}/parts/${selectedPartId}/chunks`,
-          { headers: { Authorization: `Bearer ${token}` } }
+        const res = await apiFetch(
+          `${API_BASE_URL}/documents/${chapterId}/parts/${selectedPartId}/chunks`
         );
         if (!res.ok) {
           throw new Error(`Échec de la requête : ${res.status}`);
@@ -310,7 +307,7 @@ export default function LeftPanel({ selectedPartId, setSelectedPartId, setCurren
     }
 
     fetchChunks();
-  }, [chapterId, selectedPartId, token]);
+  }, [chapterId, selectedPartId, apiFetch]);
 
   const courseChunks = useMemo(
     () => chunks.filter((c) => c.chunk_type !== "Exercice"),
