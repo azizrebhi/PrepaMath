@@ -68,12 +68,19 @@ function fixDisplayOnlyTags(content) {
 // "Démonstration page 108" is a page pointer into the physical textbook —
 // meaningless here since nothing is paginated, so it's dropped entirely
 // (but "Démonstration non exigible", which is real content, is left alone).
-// Two shapes show up in the source: standalone on its own line, and inline
-// in brackets right after "Principe de démonstration." — e.g. "Principe de
-// démonstration. [Démonstration page 109]" — the bracketed form needs a
-// non-line-anchored match since it shares a line with real content before it.
+// The source was extracted from an interactive PDF where this was a
+// clickable link/button, and leftover markup around it survived extraction
+// in at least two shapes: "<button>Démonstration page 111</button>" and a
+// bare ">Démonstration page 108<" — both tolerated here alongside the plain
+// unwrapped form. The bracketed inline shape ("Principe de démonstration.
+// [Démonstration page 109]") needs a non-line-anchored match since it shares
+// a line with real content before it.
 function stripPageReferences(content) {
-  let cleaned = content.replace(/^\s*\*{0,2}Démonstration\*{0,2}\s+page\s+\d+\.?\s*$/gim, "");
+  const core = String.raw`\*{0,2}Démonstration\*{0,2}\s+page\s+\d+\.?`;
+  let cleaned = content.replace(
+    new RegExp(String.raw`^\s*(?:<button>\s*${core}\s*<\/button>|>?\s*${core}\s*<?)\s*$`, "gim"),
+    ""
+  );
   cleaned = cleaned.replace(/\[\s*Démonstration\s+page\s+\d+\s*\]/gi, "");
   return cleaned;
 }
