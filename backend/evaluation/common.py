@@ -17,6 +17,7 @@ class ResolvedChunkRef:
     parent_index: int | None  # None if not found in the current DB
     parent_id: str | None
     content: str | None = None
+    part_id: str | None = None
 
 
 async def resolve_document_id(session, document_title: str) -> str | None:
@@ -50,6 +51,7 @@ async def resolve_chunk_ref(
                 DocumentParentChunk.id,
                 DocumentParentChunk.parent_index,
                 DocumentParentChunk.content,
+                DocumentParentChunk.part_id,
             )
             .where(
                 DocumentParentChunk.document_id == document_id,
@@ -72,4 +74,7 @@ async def resolve_chunk_ref(
     else:
         row = rows[0]
 
-    return ResolvedChunkRef(chunk_type, number, row.parent_index, str(row.id), row.content)
+    return ResolvedChunkRef(
+        chunk_type, number, row.parent_index, str(row.id), row.content,
+        str(row.part_id) if row.part_id else None,
+    )

@@ -29,6 +29,53 @@ SYSTEM_PROMPT = (
 )
 
 
+async def classify_route(client: AsyncOpenAI, lesson_content: str, question: str) -> dict:
+    """The routing decision on its own, independent of the graph — pulled out
+    so the eval harness can call exactly this (not a re-implementation of it)
+    without paying for retrieval+generation on every routing test case."""
+    prompt = (
+        "Tu dois juger UNIQUEMENT si le texte ci-dessous aborde explicitement "
+        "le sujet de la question — ignore tout ce que tu sais par ailleurs sur "
+        "le sujet, même si tu serais capable d'y répondre toi-même. Si le "
+        "texte ne traite pas explicitement de ce sujet précis, réponds "
+        "'corpus', même si la question te semble simple.\n\n"
+        "Exception : si la question est une demande générique qui se réfère "
+        "au passage actuellement affiché plutôt qu'à un sujet précis "
+        "(par exemple « explique cette partie », « résume ce passage », "
+        "« reformule ça », « je ne comprends pas ce passage »), réponds "
+        "toujours 'section' — une telle question n'a pas de sujet externe à "
+        "rechercher, elle porte par définition sur le texte déjà fourni.\n\n"
+        f"Texte actuellement affiché à l'étudiant :\n{lesson_content}\n\n"
+        f"Question de l'étudiant : {question}\n\n"
+        "Ce texte aborde-t-il explicitement le sujet de cette question ?"
+    )
+    completion = await client.chat.completions.create(
+        model=ANSWER_MODEL,
+        messages=[{"role": "user", "content": prompt}],
+        response_format={
+            "type": "json_schema",
+            "json_schema": {
+                "name": "route_decision",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "route": {"type": "string", "enum": ["section", "corpus"]}
+                    },
+                    "required": ["route"],
+                    "additionalProperties": False,
+                },
+                "strict": True,
+            },
+        },
+    )
+    decision = json.loads(completion.choices[0].message.content)
+    return {
+        "route": decision["route"],
+        "prompt_tokens": completion.usage.prompt_tokens,
+        "completion_tokens": completion.usage.completion_tokens,
+    }
+
+
 class TutorState(TypedDict):
     question: str
     document_id: str
@@ -91,47 +138,7 @@ def build_tutor_graph(session: AsyncSession ,client: AsyncOpenAI):
         }
 
     async def classify_node(state: TutorState) -> dict:
-        prompt = (
-            "Tu dois juger UNIQUEMENT si le texte ci-dessous aborde explicitement "
-            "le sujet de la question — ignore tout ce que tu sais par ailleurs sur "
-            "le sujet, même si tu serais capable d'y répondre toi-même. Si le "
-            "texte ne traite pas explicitement de ce sujet précis, réponds "
-            "'corpus', même si la question te semble simple.\n\n"
-            "Exception : si la question est une demande générique qui se réfère "
-            "au passage actuellement affiché plutôt qu'à un sujet précis "
-            "(par exemple « explique cette partie », « résume ce passage », "
-            "« reformule ça », « je ne comprends pas ce passage »), réponds "
-            "toujours 'section' — une telle question n'a pas de sujet externe à "
-            "rechercher, elle porte par définition sur le texte déjà fourni.\n\n"
-            f"Texte actuellement affiché à l'étudiant :\n{state['lesson_content']}\n\n"
-            f"Question de l'étudiant : {state['question']}\n\n"
-            "Ce texte aborde-t-il explicitement le sujet de cette question ?"
-        )
-        completion = await client.chat.completions.create(
-            model=ANSWER_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            response_format={
-                "type": "json_schema",
-                "json_schema": {
-                    "name": "route_decision",
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "route": {"type": "string", "enum": ["section", "corpus"]}
-                        },
-                        "required": ["route"],
-                        "additionalProperties": False,
-                    },
-                    "strict": True,
-                },
-            },
-        )
-        decision = json.loads(completion.choices[0].message.content)
-        return {
-            "route": decision["route"],
-            "prompt_tokens": completion.usage.prompt_tokens,
-            "completion_tokens": completion.usage.completion_tokens,
-        }
+        return await classify_route(client, state["lesson_content"], state["question"])
 
     async def corpus_retrieval_node(state: TutorState) -> dict:
         result = await run_pipeline(

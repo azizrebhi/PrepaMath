@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from openai import AsyncOpenAI
+from openai import APIError, AsyncOpenAI
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -120,20 +120,32 @@ async def ask_question(
     history = [{"role": m.role, "content": m.content} for m in prior_messages]
 
     graph = build_tutor_graph(session, client)
-    result = await graph.ainvoke({
-        "question": payload.query,
-        "document_id": str(document_id),
-        "part_id": str(payload.current_part_id),
-        "lesson_chunk_ids": [str(cid) for cid in payload.current_chunk_ids],
-        "lesson_content": "",
-        "rest_of_section_content": "",
-        "route": "",
-        "context": "",
-        "answer": "",
-        "history": history,
-        "prompt_tokens": 0,
-        "completion_tokens": 0,
-    })
+    try:
+        result = await graph.ainvoke({
+            "question": payload.query,
+            "document_id": str(document_id),
+            "part_id": str(payload.current_part_id),
+            "lesson_chunk_ids": [str(cid) for cid in payload.current_chunk_ids],
+            "lesson_content": "",
+            "rest_of_section_content": "",
+            "route": "",
+            "context": "",
+            "answer": "",
+            "history": history,
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+        })
+    except APIError:
+        # A transient OpenAI-side failure (timeout, connection drop, 5xx,
+        # momentary rate limit on their end) shouldn't surface as a raw 500 —
+        # roll back the conversation row flushed above so a failed first
+        # question doesn't leave an empty conversation behind, then ask the
+        # student to just retry rather than exposing the underlying error.
+        await session.rollback()
+        raise HTTPException(
+            status_code=503,
+            detail="Le service est temporairement indisponible. Réessaie dans un instant.",
+        )
 
     session.add_all([
         Message(conversation_id=conversation.id, role="user", content=payload.query),
