@@ -1,0 +1,119 @@
+{
+  "_schema_notes": [
+    "Unlike dataset.json (built for retrieval eval), every case here explicitly separates two things that dataset.json always kept the same: 'displayed' (what the student is assumed to be looking at) and 'relevant_chunks' / the real answer. That gap is the entire point — classify_node's job is to notice when they don't match.",
+    "displayed: {chunk_type, number, document_title} — resolved the same way dataset.json's relevant_chunks are, via evaluation/common.py:resolve_chunk_ref, then its content becomes lesson_content for the classify_node call.",
+    "expected_route: 'section' | 'corpus' | 'ambiguous'. 'ambiguous' cases are deliberately excluded from strict accuracy — forcing a single answer on a genuinely dual-valid case would corrupt the metric, not strengthen it.",
+    "category explains WHAT kind of router mistake each case is designed to catch — see each case's notes for the specific reasoning.",
+    "r11 (followup_needs_history) is flagged separately in notes: classify_node's actual prompt only receives lesson_content + question, never conversation history. A pronoun-dependent follow-up has no way to be answered correctly by the current implementation — this case documents a real, discovered system limitation, not just a hard label to pass or fail."
+  ],
+  "cases": [
+    {
+      "id": "r01",
+      "category": "clear_local",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "displayed": { "chunk_type": "Proposition", "number": "1" },
+      "query": "Si u et v commutent, pourquoi Im v est-il stable par u ?",
+      "expected_route": "section",
+      "notes": "Sanity check: displayed content is exactly the result being asked about. Should be trivially correct — if this fails, something is badly broken."
+    },
+    {
+      "id": "r02",
+      "category": "clear_local",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "displayed": { "chunk_type": "Définition", "number": "10" },
+      "query": "Que signifie qu'une suite converge vers une limite dans un espace normé ?",
+      "expected_route": "section",
+      "notes": "Same sanity-check shape as r01, different chapter."
+    },
+    {
+      "id": "r03",
+      "category": "clear_mismatch",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "displayed": { "chunk_type": "Définition", "number": "1" },
+      "query": "Quel est le polynôme caractéristique d'un endomorphisme nilpotent d'indice r ?",
+      "expected_route": "corpus",
+      "notes": "Displayed content (general stability definition) has nothing to do with nilpotent endomorphisms' characteristic polynomial (Proposition 62). Obviously unrelated — the easy negative case."
+    },
+    {
+      "id": "r04",
+      "category": "clear_mismatch",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "displayed": { "chunk_type": "Corollaire", "number": "10" },
+      "query": "Comment définit-on la frontière d'une partie A ?",
+      "expected_route": "corpus",
+      "notes": "Displayed content is about convergent sequences being bounded; question is about Fr(A), Définition 20. Unrelated topics within the same chapter."
+    },
+    {
+      "id": "r05",
+      "category": "topical_overlap_specific_vs_general",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "displayed": { "chunk_type": "Proposition", "number": "1" },
+      "query": "Comment définit-on un sous-espace vectoriel stable par un endomorphisme ?",
+      "expected_route": "corpus",
+      "notes": "The hard case: Proposition 1 uses the word 'stable' repeatedly and is genuinely about stability, but it's a specific theorem about commuting endomorphisms, not the general definition (that's Définition 1). Tests whether the router distinguishes 'mentions the topic' from 'actually answers this specific question' — a router that just does keyword/topic matching will get this wrong."
+    },
+    {
+      "id": "r06",
+      "category": "topical_overlap_specific_vs_general",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "displayed": { "chunk_type": "Définition", "number": "1" },
+      "query": "Si u et v commutent, pourquoi Ker v et Im v sont-ils stables par u ?",
+      "expected_route": "corpus",
+      "notes": "Same trap in reverse: displayed content is the general definition, question needs the specific commuting-endomorphisms result (Proposition 1), which the definition alone doesn't contain."
+    },
+    {
+      "id": "r07",
+      "category": "analogous_wrong_section",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "displayed": { "chunk_type": "Théorème", "number": "44" },
+      "query": "Dans la partie sur les endomorphismes trigonalisables, quelle condition sur le polynôme caractéristique caractérise la trigonalisabilité ?",
+      "expected_route": "corpus",
+      "notes": "Reuses dataset.json's q28 question verbatim, but now pairs it with Théorème 44 (the analogous diagonalizability condition, section III) instead of the real answer Théorème 48 (trigonalisability, section IV). These two results are structurally near-identical in phrasing ('condition on the characteristic polynomial') — exactly the kind of near-miss a router relying on surface similarity would fail."
+    },
+    {
+      "id": "r08",
+      "category": "meta_request",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "displayed": { "chunk_type": "Corollaire", "number": "3" },
+      "query": "Tu peux réexpliquer ce passage autrement, je ne comprends pas bien ?",
+      "expected_route": "section",
+      "notes": "Tests classify_node's explicit exception: a generic 'explain/rephrase this' request has no external subject to search for, so it must always route to section regardless of what's displayed. Displayed chunk is arbitrary on purpose."
+    },
+    {
+      "id": "r09",
+      "category": "meta_request",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "displayed": { "chunk_type": "Théorème", "number": "60" },
+      "query": "Résume ce passage en une phrase.",
+      "expected_route": "section",
+      "notes": "Second meta-request phrasing, different displayed chunk, to make sure r08 passing wasn't a fluke tied to one specific chunk."
+    },
+    {
+      "id": "r10",
+      "category": "ambiguous",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "displayed": { "chunk_type": "Proposition", "number": "29" },
+      "query": "Comment calcule-t-on le polynôme caractéristique d'un endomorphisme en général ?",
+      "expected_route": "ambiguous",
+      "notes": "Proposition 29 gives real, relevant properties (degree, leading coefficient, constant term) but not a full general computation method. A reasonable router could go either way — deliberately excluded from accuracy scoring rather than forced to one label."
+    },
+    {
+      "id": "r11",
+      "category": "followup_needs_history",
+      "document_title": "Chapitre 2 : Réduction des endomorphismes",
+      "displayed": { "chunk_type": "Corollaire", "number": "3" },
+      "query": "Et si F n'est pas de dimension finie, ça change quoi ?",
+      "expected_route": "corpus",
+      "notes": "Discovered limitation, not a clean test: this question is only interpretable given a prior turn establishing what 'ça' refers to, but classify_node's prompt never receives conversation history — only lesson_content and the bare question. Whatever it outputs here is answering a question it can't actually fully parse. Track this case's result separately from the accuracy number; a pass or fail here says more about this gap than about routing quality."
+    },
+    {
+      "id": "r12",
+      "category": "clear_local",
+      "document_title": "Chapitre 4 : Espaces vectoriels normés",
+      "displayed": { "chunk_type": "Exercice", "number": "1" },
+      "query": "Comment montrer que l'application x en racine de (x|x) est une norme sur un espace préhilbertien réel ?",
+      "expected_route": "section",
+      "notes": "Third sanity-check case, exercise-type content this time rather than Définition/Proposition."
+    }
+  ]
+}

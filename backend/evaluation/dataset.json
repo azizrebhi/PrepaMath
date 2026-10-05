@@ -4,7 +4,8 @@
     "relevant_chunks entries are {chunk_type, number} pairs (not raw parent_index integers) — resolved to the current DocumentParentChunk.parent_index at eval time, since parent_index is assignment-order-dependent and would go stale across re-ingests. See evaluation/common.py:resolve_chunk_ref.",
     "expected_ingestion_gap: true marks queries deliberately targeting content known to be dropped/overwritten by the unnumbered Exemple/Remarque collision bug in task.py (see code review). These should FAIL to resolve until that bug is fixed and the chapter is re-ingested — validate_dataset.py reports them separately rather than as dataset errors.",
     "content_snippet (optional) is a short verbatim excerpt used as an extra sanity check that the resolved parent's content is actually the intended passage, not just a coincidentally-matching (chunk_type, number).",
-    "document_title now lives on each question (not top-level) — the dataset spans multiple chapters/documents."
+    "document_title now lives on each question (not top-level) — the dataset spans multiple chapters/documents.",
+    "expected_route ('section' | 'corpus') assumes the canonical case: the student is viewing exactly the chunk(s) in relevant_chunks when asking. This makes every single-chunk question 'section' by construction and is NOT a balanced routing eval on its own — it only tests whether the router recognizes an obviously-local question. multi_context questions (q26, q27, q46) are labeled 'corpus' since no single displayed chunk contains both facts the question needs. Real routing signal has to come from a separate, deliberately adversarial set (student viewing part X, asking something that actually needs part Y) — see evaluation/routing_cases.json."
   ],
   "questions": [
     {
@@ -18,7 +19,8 @@
           "number": "1"
         }
       ],
-      "content_snippet": "Un sous-espace vectoriel F de E est dit stable par u si u(F) ⊂ F"
+      "content_snippet": "Un sous-espace vectoriel F de E est dit stable par u si u(F) ⊂ F",
+      "expected_route": "section"
     },
     {
       "id": "q02",
@@ -31,7 +33,8 @@
           "number": "2"
         }
       ],
-      "content_snippet": "On appelle endomorphisme induit par u sur F"
+      "content_snippet": "On appelle endomorphisme induit par u sur F",
+      "expected_route": "section"
     },
     {
       "id": "q03",
@@ -44,7 +47,8 @@
           "number": "10"
         }
       ],
-      "content_snippet": "On appelle polynôme caractéristique de l'endomorphisme"
+      "content_snippet": "On appelle polynôme caractéristique de l'endomorphisme",
+      "expected_route": "section"
     },
     {
       "id": "q04",
@@ -57,7 +61,8 @@
           "number": "1"
         }
       ],
-      "content_snippet": "Ker v et Im v sont stables par u"
+      "content_snippet": "Ker v et Im v sont stables par u",
+      "expected_route": "section"
     },
     {
       "id": "q05",
@@ -70,7 +75,8 @@
           "number": "2"
         }
       ],
-      "content_snippet": "u(e_i) \\in F"
+      "content_snippet": "u(e_i) \\in F",
+      "expected_route": "section"
     },
     {
       "id": "q06",
@@ -83,7 +89,8 @@
           "number": "3"
         }
       ],
-      "content_snippet": "triangulaire par blocs"
+      "content_snippet": "triangulaire par blocs",
+      "expected_route": "section"
     },
     {
       "id": "q07",
@@ -96,7 +103,8 @@
           "number": "29"
         }
       ],
-      "content_snippet": "unitaire, de degré $n$"
+      "content_snippet": "unitaire, de degré $n$",
+      "expected_route": "section"
     },
     {
       "id": "q08",
@@ -109,7 +117,8 @@
           "number": "30"
         }
       ],
-      "content_snippet": "racine du polynôme caractéristique"
+      "content_snippet": "racine du polynôme caractéristique",
+      "expected_route": "section"
     },
     {
       "id": "q09",
@@ -122,7 +131,8 @@
           "number": "44"
         }
       ],
-      "content_snippet": "diagonalisable si, et seulement si"
+      "content_snippet": "diagonalisable si, et seulement si",
+      "expected_route": "section"
     },
     {
       "id": "q10",
@@ -135,7 +145,8 @@
           "number": "48"
         }
       ],
-      "content_snippet": "trigonalisable"
+      "content_snippet": "trigonalisable",
+      "expected_route": "section"
     },
     {
       "id": "q11",
@@ -148,7 +159,8 @@
           "number": "60"
         }
       ],
-      "content_snippet": "scindé à racines simples"
+      "content_snippet": "scindé à racines simples",
+      "expected_route": "section"
     },
     {
       "id": "q12",
@@ -161,7 +173,8 @@
           "number": "61"
         }
       ],
-      "content_snippet": "u_F est diagonalisable"
+      "content_snippet": "u_F est diagonalisable",
+      "expected_route": "section"
     },
     {
       "id": "q13",
@@ -174,7 +187,8 @@
           "number": "62"
         }
       ],
-      "content_snippet": "nilpotent d'indice"
+      "content_snippet": "nilpotent d'indice",
+      "expected_route": "section"
     },
     {
       "id": "q14",
@@ -187,7 +201,8 @@
           "number": "28"
         }
       ],
-      "content_snippet": "Deux matrices semblables ont même polynôme caractéristique"
+      "content_snippet": "Deux matrices semblables ont même polynôme caractéristique",
+      "expected_route": "section"
     },
     {
       "id": "q15",
@@ -200,7 +215,8 @@
           "number": "30"
         }
       ],
-      "content_snippet": "n'est pas inversible"
+      "content_snippet": "n'est pas inversible",
+      "expected_route": "section"
     },
     {
       "id": "q16",
@@ -213,7 +229,8 @@
           "number": "48"
         }
       ],
-      "content_snippet": "récurrence"
+      "content_snippet": "récurrence",
+      "expected_route": "section"
     },
     {
       "id": "q17",
@@ -226,7 +243,8 @@
           "number": "1"
         }
       ],
-      "content_snippet": "la famille $(*x, u*(x))$ est liée"
+      "content_snippet": "la famille $(*x, u*(x))$ est liée",
+      "expected_route": "section"
     },
     {
       "id": "q18",
@@ -239,7 +257,8 @@
           "number": "2"
         }
       ],
-      "content_snippet": "la dérivation de $\\mathbb{K}[X]$"
+      "content_snippet": "la dérivation de $\\mathbb{K}[X]$",
+      "expected_route": "section"
     },
     {
       "id": "q19",
@@ -252,7 +271,8 @@
           "number": "3"
         }
       ],
-      "content_snippet": "sous-algèbre"
+      "content_snippet": "sous-algèbre",
+      "expected_route": "section"
     },
     {
       "id": "q20",
@@ -265,7 +285,8 @@
           "number": "4"
         }
       ],
-      "content_snippet": "stabilisent chaque"
+      "content_snippet": "stabilisent chaque",
+      "expected_route": "section"
     },
     {
       "id": "q21",
@@ -278,7 +299,8 @@
           "number": "18"
         }
       ],
-      "content_snippet": "de rang 1"
+      "content_snippet": "de rang 1",
+      "expected_route": "section"
     },
     {
       "id": "q22",
@@ -291,7 +313,8 @@
           "number": "23"
         }
       ],
-      "content_snippet": "diagonalisable"
+      "content_snippet": "diagonalisable",
+      "expected_route": "section"
     },
     {
       "id": "q23",
@@ -306,7 +329,8 @@
           "number": null
         }
       ],
-      "content_snippet": "une homothétie stabilise tous les sous-espaces vectoriels de $E$"
+      "content_snippet": "une homothétie stabilise tous les sous-espaces vectoriels de $E$",
+      "expected_route": "section"
     },
     {
       "id": "q24",
@@ -321,7 +345,8 @@
           "number": null
         }
       ],
-      "content_snippet": "L'image de $u_F$ est égale à $u(F)$"
+      "content_snippet": "L'image de $u_F$ est égale à $u(F)$",
+      "expected_route": "section"
     },
     {
       "id": "q25",
@@ -336,7 +361,8 @@
           "number": null
         }
       ],
-      "content_snippet": "endomorphisme d’un espace vectoriel de dimension $n$ a au plus $n$ valeurs propres distinctes"
+      "content_snippet": "endomorphisme d’un espace vectoriel de dimension $n$ a au plus $n$ valeurs propres distinctes",
+      "expected_route": "section"
     },
     {
       "id": "q26",
@@ -354,7 +380,8 @@
           "number": "33"
         }
       ],
-      "content_snippet": "divise le polynôme scindé"
+      "content_snippet": "divise le polynôme scindé",
+      "expected_route": "corpus"
     },
     {
       "id": "q27",
@@ -372,7 +399,8 @@
           "number": "61"
         }
       ],
-      "content_snippet": "scindé à racines simples"
+      "content_snippet": "scindé à racines simples",
+      "expected_route": "corpus"
     },
     {
       "id": "q28",
@@ -386,7 +414,8 @@
           "number": "48"
         }
       ],
-      "content_snippet": "trigonalisable"
+      "content_snippet": "trigonalisable",
+      "expected_route": "section"
     },
     {
       "id": "q29",
@@ -400,7 +429,8 @@
           "number": "29"
         }
       ],
-      "content_snippet": "\\text{Tr } u"
+      "content_snippet": "\\text{Tr } u",
+      "expected_route": "section"
     },
     {
       "id": "q30",
@@ -413,7 +443,8 @@
           "number": "1"
         }
       ],
-      "content_snippet": "vérifiant les trois propriétés suivantes"
+      "content_snippet": "vérifiant les trois propriétés suivantes",
+      "expected_route": "section"
     },
     {
       "id": "q31",
@@ -426,7 +457,8 @@
           "number": "4"
         }
       ],
-      "content_snippet": "distance associée à la norme"
+      "content_snippet": "distance associée à la norme",
+      "expected_route": "section"
     },
     {
       "id": "q32",
@@ -439,7 +471,8 @@
           "number": "10"
         }
       ],
-      "content_snippet": "tend vers 0"
+      "content_snippet": "tend vers 0",
+      "expected_route": "section"
     },
     {
       "id": "q33",
@@ -452,7 +485,8 @@
           "number": "19"
         }
       ],
-      "content_snippet": "est dite dense"
+      "content_snippet": "est dite dense",
+      "expected_route": "section"
     },
     {
       "id": "q34",
@@ -465,7 +499,8 @@
           "number": "20"
         }
       ],
-      "content_snippet": "Fr(A)"
+      "content_snippet": "Fr(A)",
+      "expected_route": "section"
     },
     {
       "id": "q35",
@@ -478,7 +513,8 @@
           "number": "1"
         }
       ],
-      "content_snippet": "Inégalités triangulaires"
+      "content_snippet": "Inégalités triangulaires",
+      "expected_route": "section"
     },
     {
       "id": "q36",
@@ -491,7 +527,8 @@
           "number": "7"
         }
       ],
-      "content_snippet": "Unicité de la limite"
+      "content_snippet": "Unicité de la limite",
+      "expected_route": "section"
     },
     {
       "id": "q37",
@@ -504,7 +541,8 @@
           "number": "8"
         }
       ],
-      "content_snippet": "Combinaison linéaire de deux suites convergentes"
+      "content_snippet": "Combinaison linéaire de deux suites convergentes",
+      "expected_route": "section"
     },
     {
       "id": "q38",
@@ -517,7 +555,8 @@
           "number": "10"
         }
       ],
-      "content_snippet": "Toute suite convergente est bornée"
+      "content_snippet": "Toute suite convergente est bornée",
+      "expected_route": "section"
     },
     {
       "id": "q39",
@@ -530,7 +569,8 @@
           "number": "11"
         }
       ],
-      "content_snippet": "pour tout $k \\in \\llbracket 1, p \\rrbracket$, la suite de terme général $a_n^{(k)}$ converge"
+      "content_snippet": "pour tout $k \\in \\llbracket 1, p \\rrbracket$, la suite de terme général $a_n^{(k)}$ converge",
+      "expected_route": "section"
     },
     {
       "id": "q40",
@@ -543,7 +583,8 @@
           "number": "23"
         }
       ],
-      "content_snippet": "forment une partition de $E$"
+      "content_snippet": "forment une partition de $E$",
+      "expected_route": "section"
     },
     {
       "id": "q41",
@@ -556,7 +597,8 @@
           "number": "7"
         }
       ],
-      "content_snippet": "En passant à la limite"
+      "content_snippet": "En passant à la limite",
+      "expected_route": "section"
     },
     {
       "id": "q42",
@@ -569,7 +611,8 @@
           "number": "10"
         }
       ],
-      "content_snippet": "la suite réelle $(\\|a_n\\|)_{n \\in \\mathbb{N}}$ est également convergente, donc bornée"
+      "content_snippet": "la suite réelle $(\\|a_n\\|)_{n \\in \\mathbb{N}}$ est également convergente, donc bornée",
+      "expected_route": "section"
     },
     {
       "id": "q43",
@@ -582,7 +625,8 @@
           "number": "1"
         }
       ],
-      "content_snippet": "espace préhilbertien réel"
+      "content_snippet": "espace préhilbertien réel",
+      "expected_route": "section"
     },
     {
       "id": "q44",
@@ -595,7 +639,8 @@
           "number": "6"
         }
       ],
-      "content_snippet": "invariance par translation"
+      "content_snippet": "invariance par translation",
+      "expected_route": "section"
     },
     {
       "id": "q45",
@@ -608,7 +653,8 @@
           "number": "21"
         }
       ],
-      "content_snippet": "$f_n(x) = x^n$"
+      "content_snippet": "$f_n(x) = x^n$",
+      "expected_route": "section"
     },
     {
       "id": "q46",
@@ -626,7 +672,8 @@
           "number": "12"
         }
       ],
-      "content_snippet": "valeur d'adhérence"
+      "content_snippet": "valeur d'adhérence",
+      "expected_route": "corpus"
     },
     {
       "id": "q47",
@@ -640,7 +687,8 @@
           "number": "22"
         }
       ],
-      "content_snippet": "dominée"
+      "content_snippet": "dominée",
+      "expected_route": "section"
     },
     {
       "id": "q48",
@@ -654,7 +702,8 @@
           "number": "42"
         }
       ],
-      "content_snippet": "ouvert relatif de"
+      "content_snippet": "ouvert relatif de",
+      "expected_route": "section"
     },
     {
       "id": "q49",
@@ -668,7 +717,8 @@
           "number": "5"
         }
       ],
-      "content_snippet": "Déterminer les valeurs propres et les sous-espaces propres de $D$"
+      "content_snippet": "Déterminer les valeurs propres et les sous-espaces propres de $D$",
+      "expected_route": "section"
     }
   ]
 }
