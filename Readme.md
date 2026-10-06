@@ -20,7 +20,9 @@ An AI tutor for French "classes préparatoires" (CPGE) mathematics — ingests r
 
 **Students** in a French CPGE math track (MP/MPSI and similar) who want to read their course chapter by chapter and ask questions about exactly the section they're stuck on, instead of a generic chatbot that doesn't know what page they're on.
 
-**Anyone reading this repo** — if you're here to evaluate the engineering rather than use the app: this README leads with the parts that show how the system was actually built and validated, not just what it does. In particular, [`evaluation/RESULTS.md`](backend/evaluation/RESULTS.md) is a from-scratch retrieval benchmark that found and fixed four real bugs (one of them silently corrupting a third of the ingested corpus) with before/after numbers for each — that document is the single best entry point if you want to see the engineering process rather than the feature list.
+**Anyone reading this repo** — if you're here to evaluate the engineering rather than use the app: this README leads with the parts that show how the system was actually built and validated, not just what it does. Two documents are the real entry points:
+- [`evaluation/RESULTS.md`](backend/evaluation/RESULTS.md) — a from-scratch retrieval benchmark that found and fixed four real bugs (one of them silently corrupting a third of the ingested corpus) with before/after numbers for each.
+- [`evaluation/AGENT_RESULTS.md`](backend/evaluation/AGENT_RESULTS.md) — evaluates the agentic part specifically: does the LangGraph router's section-vs-corpus decision actually route correctly, and is the generated answer any good (RAGAS-style LLM-as-judge, a different model judging than the one generating). It also documents a routing bug found independently by two separate evals built weeks apart, and a conversation-history-blind routing gap discovered while building the harness, not predicted in advance.
 
 ## The problem
 
@@ -76,6 +78,8 @@ A few decisions worth calling out specifically, because they're the parts that t
 - **Section-aware navigation that isn't search-derived.** `ChapterPart` rows are real structural sections (detected from the source's own Roman-numeral *and* nested numbered headers — see the two-level detection in `task.py`'s `find_sections`), not clusters inferred after the fact. The left panel reads a part's chunks directly; no embedding call is needed to render a lesson.
 - **The "which section is this question about" problem is actively routed, not punted to the LLM's context window.** The classify → section-or-corpus split in `tutor_graph.py` exists specifically so "explain this part" and "what's the definition of X from two sections ago" get handled differently — and when that routing was wrong (see [Next steps](#next-steps)), the fix was a prompt rule plus a structural fallback, not a single patch.
 - **Content quality bugs were treated as bugs, with evidence.** Several ingestion defects (duplicate unnumbered examples, a page-reference prefix silently breaking heading detection, chapter-section headers bleeding into adjacent chunk content) were root-caused against the actual stored markdown and fixed with before/after verification — not patched blind. See `evaluation/RESULTS.md` findings 1 and 4 for the two that were numerically measured; the section-boundary and heading-duplication fixes in `task.py` and the frontend's `LeftPanel.jsx` content-cleaning pipeline followed the same discipline.
+- **The agentic routing decision is evaluated, not just assumed to work.** `classify_node`'s section-vs-corpus call is the one point where this system makes a real agent decision rather than following a fixed pipeline — so it's the one point with a dedicated adversarial eval (`evaluation/AGENT_RESULTS.md`), deliberately designed with cases that *should* fool a router leaning on surface wording instead of comprehension. One did: the same failure mode (vocabulary overlap causing a wrong route) was found independently in two separate evals built weeks apart, which is stronger evidence than either alone.
+- **Two different rate-limiting mechanisms for two different threats, deliberately not one.** A Redis-backed, IP-keyed, fixed-window limiter (`app/rate_limit.py`, `slowapi`) stops request-rate abuse; a separate Postgres-backed, user-keyed, rolling-24h token budget (`app/routers/answer.py`) caps per-user cost. They use different stores and different window semantics on purpose — the burst limiter prioritizes being cheap and fast over being precise, the cost cap prioritizes precision because real money is at stake, and a fixed window's known boundary-gaming edge case is an acceptable tradeoff on the former but not the latter.
 
 ## Tech stack
 
@@ -83,7 +87,7 @@ A few decisions worth calling out specifically, because they're the parts that t
 
 **Frontend** — React 19, Vite, React Router, Tailwind CSS v4, `@tailwindcss/typography`, `react-markdown` + `remark-math` + `rehype-katex` for LaTeX rendering, `lucide-react` icons, `framer-motion`.
 
-**Infra (provisioned, not yet all wired in)** — Docker Compose for local Postgres+pgvector and Redis. Redis and Celery are dependencies in `pyproject.toml` for a planned async ingestion queue; ingestion currently runs synchronously via CLI (`task.py`), so neither is actually exercised by the running app yet.
+**Infra** — Docker Compose for local Postgres+pgvector and Redis. Redis now backs the request rate limiter (`slowapi`) — see rate-limiting bullet above. Celery is still a `pyproject.toml` dependency for a planned async ingestion queue, not yet wired in; ingestion currently runs synchronously via CLI (`task.py`).
 
 ## Project structure
 
@@ -105,24 +109,34 @@ backend/
       retrieval_pipeline.py      lexical/dense/hybrid/rerank, flag-selectable
       rerank.py                  cross-encoder reranking (disabled by default)
       tutor_graph.py              LangGraph nodes: load_section → classify → (corpus) → generate
+    rate_limit.py                 shared slowapi Limiter instance (Redis-backed)
   evaluation/
-    RESULTS.md                   the benchmark writeup — start here
-    dataset.json                 49 hand-curated Q&A pairs with expected source chunks
-    run_retrieval_eval.py, metrics.py, build_candidates.py, validate_dataset.py
+    RESULTS.md                   retrieval benchmark writeup — start here
+    AGENT_RESULTS.md              routing + answer-quality (RAGAS-style) eval writeup
+    dataset.json                  49 hand-curated Q&A pairs with expected source chunks + expected_route
+    routing_cases.json            12 adversarial routing-only cases (displayed content ≠ answer source)
+    run_retrieval_eval.py, run_routing_eval.py, run_agent_eval.py, metrics.py,
+    build_candidates.py, validate_dataset.py
   alembic/                       migrations
 
 prepamath-frontend/
   src/
-    pages/                       WelcomePage, RoadmapPage, ChapterWorkspacePage,
-                                  LoginPage, RegisterPage, GoogleCallbackPage
+    pages/                       WelcomePage, RoadmapPage, SubjectGraphPage,
+                                  ChapterWorkspacePage, LoginPage, RegisterPage,
+                                  GoogleCallbackPage
     components/
       workspace/
         SplitPanel.jsx            resizable two-pane layout, holds shared selectedPartId
         LeftPanel.jsx              section list, lesson-grouped reading view,
                                    exercises popup, all markdown content-cleaning
         RightPanel.jsx             chat: ask, persist, and restore conversation history
+      roadmap/
+        ChapterGraphView.jsx       React Flow dependency graph (Algèbre/Analyse)
+      marketing/                  landing-page-only components (WorkspacePreview,
+                                   VandermondeVisual) — not shared with the real workspace
       layout/                     AppShell, Navbar
-      background/                 FloatingBackground
+      background/                 FloatingBackground.jsx — currently unused dead code,
+                                   see Known limitations
     context/AuthContext.jsx       JWT token storage/retrieval
 ```
 
@@ -189,6 +203,10 @@ cd backend
 uv run python evaluation/validate_dataset.py        # confirm dataset matches current DB
 uv run python evaluation/run_retrieval_eval.py       # writes evaluation/results/*.json
 uv run python evaluation/metrics.py evaluation/results/dense.json evaluation/results/hybrid.json evaluation/results/reranked.json
+
+# Agentic routing + answer-quality eval (evaluation/AGENT_RESULTS.md)
+uv run python evaluation/run_routing_eval.py         # writes evaluation/results/routing_eval.json
+uv run python evaluation/run_agent_eval.py            # writes evaluation/results/agent_eval.json (costs real OpenAI usage — 49 full graph runs + 49 gpt-4o judge calls)
 ```
 
 ## Known limitations
@@ -199,7 +217,12 @@ Being direct about these rather than letting them surface as surprises:
 - **No automated tests.** Everything so far has been validated via the evaluation harness (for retrieval) and manual/scripted verification against the live DB (for ingestion fixes) — solid for what it covers, but there's no CI, no regression suite for the API or the LangGraph flow.
 - **`/ask`'s `sources` field is always empty.** The response schema supports returning which chunks grounded an answer, but `answer.py` never populates it — the frontend's source-citation UI has nothing to render yet.
 - **Reranking is implemented but disabled.** The cross-encoder model tested (`cross-encoder/mmarco-mMiniLMv2-L12-H384-v1`) measurably favors long passages over short precise definitions on this corpus (see `RESULTS.md` finding 3) — the code path is kept for a future model swap, not deleted.
-- **Celery/Redis are provisioned, not used.** Ingestion runs synchronously via CLI; there's no background job queue wired up yet despite both being in `docker-compose.yml` and `pyproject.toml`.
+- **`classify_node`'s routing has a measured, directional weakness.** It leans on surface vocabulary overlap more than semantic comprehension — found independently in two separate evals (see `evaluation/AGENT_RESULTS.md`). Not fixed yet; the eval exists specifically so a prompt fix can be measured against it rather than eyeballed.
+- **Routing is conversation-history-blind.** `classify_node` only ever sees the current question and the current screen, never prior turns — a pronoun-dependent follow-up ("what about that other case?") can't be routed correctly in principle, not just in practice. Discovered while building the routing eval, not designed for in advance.
+- **Conversation history is resent in full on every turn, with no truncation or summarization.** Measured directly: a second question in the same conversation cost more tokens than the first, purely from `generate_node` resending the whole history. Not yet a real problem at current usage, but it's an unbounded cost-scaling issue, not a hypothetical one.
+- **Celery is provisioned, not used.** Redis is now used (rate limiting — see above), but ingestion still runs synchronously via CLI; no background job queue is wired up despite Celery being in `pyproject.toml`.
+- **`FloatingBackground.jsx` is dead code.** Still in the repo from before the landing-page redesign; no longer imported anywhere.
+- **No request tracing/observability.** No LangSmith or structured per-node logging — a multi-node LangGraph agent with no way to inspect what a specific real request's route/latency/token breakdown actually was, beyond what's reconstructable from the `Message` table.
 - **Not deployed anywhere.** Local Docker Compose + `uvicorn --reload` + `vite dev` only.
 
 ## Next steps
@@ -215,16 +238,20 @@ Roughly in the order they'd unblock the most value:
 4. **Populate `AskResponse.sources`** in `answer.py` so the frontend can actually show which chunks grounded an answer — the schema and frontend UI both already expect this field, it's just never filled in.
 5. **Re-run the reranker experiment with a different cross-encoder** better suited to short formal definitions (the current one's length bias is documented, not fixed) — `evaluation/` is built specifically so this is a rerun-and-compare, not a new harness.
 6. Investigate whether a smarter lexical query construction (rather than OR-ing all terms) recovers any of hybrid retrieval's lost precision, now that the lexical channel itself is confirmed functional post-fix.
-7. Add eval cases for the `classify_node` routing fix (self-referential "explique cette partie"-style questions) to `evaluation/dataset.json` or a parallel routing-specific eval — right now that fix is verified by code review and the bug report that triggered it, not by a regression suite.
+7. **Fix `classify_node`'s vocabulary-overlap weakness** (`evaluation/AGENT_RESULTS.md`, Findings 1-2) — likely a prompt change (e.g. a few-shot paraphrase example) to push it toward semantic matching; re-run `run_routing_eval.py`/`run_agent_eval.py` against the existing baseline to measure whether it actually helped, not just whether it feels better.
+8. **Give `classify_node` conversation history.** Currently routes blind to prior turns (`AGENT_RESULTS.md`, Finding 3) — a real fix, not just a documented limitation, once the token-cost tradeoff of including history in every routing call is considered.
+9. **Truncate or summarize conversation history** in `generate_node` instead of resending it in full every turn — a measured, unbounded cost-scaling issue (see Known limitations), and the fix most directly tied to real OpenAI cost.
 
 ### Product features
-8. **Progress tracking** — which lessons/exercises a student has actually viewed, surfaced back in the section list (the UI already has a natural slot for this next to each section's row).
-9. **Exercise difficulty/status** — the NeetCode-inspired side-nav redesign deliberately left out fake "solved"/"difficulty" concepts rather than fabricate them; if progress tracking lands, this becomes meaningful instead of decorative.
-10. Cross-chapter retrieval/search from the roadmap page, not just within a single open chapter.
+10. **Progress tracking** — which lessons/exercises a student has actually viewed, surfaced back in the section list (the UI already has a natural slot for this next to each section's row).
+11. **Exercise difficulty/status** — the NeetCode-inspired side-nav redesign deliberately left out fake "solved"/"difficulty" concepts rather than fabricate them; if progress tracking lands, this becomes meaningful instead of decorative.
+12. Cross-chapter retrieval/search from the roadmap page, not just within a single open chapter.
+13. **Tool-use for the agent** — a symbolic math tool (SymPy) so the model verifies computations (characteristic polynomials, eigenvalues) instead of guessing at arithmetic, and an exact `(chunk_type, number)` lookup tool for unambiguous references ("explain Exercice 4") instead of routing them through semantic search. Deliberately not MCP — a single in-process backend with no cross-application tool sharing need doesn't justify a separate protocol/server; LangGraph's native tool-calling is the simpler, correct-fit choice here.
 
 ### Engineering hygiene
-11. **Automated tests** — at minimum, API-level tests for `/ask`, `/documents/*`, and auth flows; a regression test replaying `evaluation/dataset.json`'s expected-source assertions against the live retrieval endpoint.
-12. **Wire up Celery for ingestion** so adding a chapter doesn't block on a synchronous CLI run — the infra is already provisioned in `docker-compose.yml`.
-13. **CI** — run the test suite (once it exists) and the evaluation harness's `validate_dataset.py` check on every PR, so a schema change that silently breaks the eval dataset's assumptions gets caught immediately.
-14. **Deployment** — containerize the FastAPI app and the built frontend, move secrets out of local `.env` files, move the source `.md`/processed markdown to S3 (already anticipated in `Document.file_path`'s docstring as "Phase 9").
-15. **Remove the temporary debug exception handler** in `main.py` (added to diagnose a Google OAuth 500 — it currently returns raw exception details in API responses, which is fine for local dev and wrong for anything public).
+14. **Automated tests** — at minimum, API-level tests for `/ask`, `/documents/*`, and auth flows; a regression test replaying `evaluation/dataset.json`'s expected-source assertions against the live retrieval endpoint.
+15. **Wire up Celery for ingestion** so adding a chapter doesn't block on a synchronous CLI run — the infra is already provisioned in `docker-compose.yml`.
+16. **CI** — run the test suite (once it exists) and the evaluation harness's `validate_dataset.py` check on every PR, so a schema change that silently breaks the eval dataset's assumptions gets caught immediately.
+17. **Request tracing/observability** — LangSmith (near-zero-code with LangGraph) or at minimum structured per-node logging (route chosen, latency, tokens), so a specific real request's behavior is inspectable after the fact instead of only reconstructable from the `Message` table.
+18. **Deploy to Render (backend + Postgres + Redis) and Vercel (frontend)**, not AWS, at this stage — evaluated deliberately: a naive AWS setup's fixed costs (NAT Gateway, ALB, RDS, ElastiCache baselines) run roughly $70-100+/month before any real traffic, against ~$15-30/month for an equivalent Render+Vercel setup, for a stack with no actual need for AWS-specific services. Render's managed Postgres supports `pgvector` natively (confirmed directly against their docs), so there's no technical reason to split the database to a third provider either. The AWS architecture this would migrate to if usage ever justified it (App Runner + RDS + Upstash Redis instead of ElastiCache, to avoid the same cost traps) is documented as a deliberate future option, not a gap.
+19. **Remove the temporary debug exception handler** in `main.py` (added to diagnose a Google OAuth 500 — it currently returns raw exception details in API responses, which is fine for local dev and wrong for anything public).
