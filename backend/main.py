@@ -1,3 +1,4 @@
+import os
 import traceback
 
 from fastapi import FastAPI, Request
@@ -38,10 +39,16 @@ async def debug_exception_handler(request: Request, exc: Exception):
     )
 
 # Vite's dev server picks a port (5173, falls back to 5174, ...) — allow
-# both rather than hardcoding one and re-editing this every time it shifts.
+# both by default rather than hardcoding one and re-editing this every time
+# it shifts. In production, set ALLOWED_ORIGINS to a comma-separated list
+# (e.g. the deployed Vercel URL) — without it, the deployed frontend's
+# requests get rejected by the browser's own CORS check before this app's
+# code ever runs.
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:5174").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
@@ -53,7 +60,11 @@ app.include_router(fastapi_users.get_oauth_router(
     google_oauth_client,
     auth_backend,
     SECRET,
-    redirect_url="http://localhost:5173/auth/google/callback",
+    # Must exactly match a redirect URI registered in Google's OAuth
+    # console — Google rejects the callback outright on any mismatch, so
+    # this has to point at the deployed frontend's URL in production, not
+    # localhost.
+    redirect_url=os.getenv("GOOGLE_OAUTH_REDIRECT_URL", "http://localhost:5173/auth/google/callback"),
     associate_by_email=True,
           ),
           prefix="/auth/google",
