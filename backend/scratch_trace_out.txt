@@ -1,0 +1,20 @@
+--- match i=20: Corollaire 9 at pos 11864 ---
+heading text: '### **Corollaire 9**'
+body_after_heading (len=0): ''
+
+--- match i=21: Corollaire 9 at pos 11885 ---
+heading text: '## **Corollaire 9**'
+body_after_heading (len=206): "Soit $\\mathcal{B} = (e_1, e_2, \\dots, e_p)$ une base orthonormale d'un sous-espace vectoriel $F$ de $E$. On a l'égalité :\n\n$$d^2(*x, F*) = \\|x\\|^2 - \\"
+
+--- match i=22: Corollaire 10 at pos 12115 ---
+heading text: '### **Corollaire 10'
+body_after_heading (len=23): '(Inégalité de Bessel)**'
+
+--- match i=23: Corollaire 10 at pos 12159 ---
+heading text: '# **Corollaire 10'
+body_after_heading (len=165): '(Inégalité de Bessel)**\n\nSi $(e_1, \\dots, e_p)$ est une famille orthonormée de $E$, on a, pour tout $x \\in E$ :\n\n$$\\sum_{i=1}^{p} (e_i \\mid x)^2 \\leqs'
+
+--- match i=77: Corollaire 9 at pos 40531 ---
+heading text: '**Corollaire 9**'
+body_after_heading (len=270): 'Par projection orthogonale sur le sous-espace $F$ engendré par $(e_1, \\dots, e_p)$, on a :\n$$x = p_F(x) + g = \\sum_{i=1}^p (e_i \\mid x) e_i + g \\quad '
+

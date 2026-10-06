@@ -45,8 +45,14 @@ function stripRedundantHeadings(content, chunkType, number) {
   // badge already rendered above it.
   const headingPattern = `#{0,3}\\s*\\*{0,3}\\s*${escType}s?\\s*${escNumber}(?:\\s*\\([^)]*\\))?\\s*\\*{0,3}`;
 
+  // Exemple/Remarque are often written inline — heading and text on the
+  // same line ("**Exemple** On a vu en première année...") — rather than on
+  // their own line like Définition/Proposition usually are. Requiring a
+  // newline after the heading missed that shape entirely, leaving the
+  // redundant "**Exemple**" sitting in the content right under the separate
+  // badge that already says "Exemple".
   let cleaned = content.replace(
-    new RegExp(`^(?:p\\.\\d+\\s+)?${headingPattern}\\s*\\n+`, "i"),
+    new RegExp(`^(?:p\\.\\d+\\s+)?${headingPattern}(?:\\s*\\n+|[ \\t]+)`, "i"),
     ""
   );
   cleaned = cleaned.replace(
@@ -108,7 +114,17 @@ function stripRunningHeaderArtifacts(content) {
 // either way, but the correct French math term depends on which one this is.
 function styleSolutionMarker(content, chunkType) {
   const heading = chunkType === "Exercice" ? "Solution" : "Démonstration";
-  return content.replace(/---\s*Solution\s*\([^)]*\)\s*---/gi, `\n#### ${heading}\n`);
+  let styled = content.replace(/---\s*Solution\s*\([^)]*\)\s*---/gi, `\n#### ${heading}\n`);
+  // Many demonstrations are written inline right after the statement, with
+  // no "--- Solution (...) ---" merge marker at all — just a bare
+  // "**Démonstration.**" label (confirmed: Proposition 1/2/3, Théorème 5 in
+  // a real chapter). Without this, it renders as plain bold text,
+  // indistinguishable from the surrounding prose. Capital-D and the
+  // trailing period specifically target the heading-style usage, not a
+  // lowercase mid-sentence mention like "d'après cette démonstration...".
+  // Only the first occurrence — a chunk legitimately states this once.
+  styled = styled.replace(/\*{0,2}Démonstration\.\*{0,2}(?!\w)/, `\n#### ${heading}\n`);
+  return styled;
 }
 
 // Définitions, Corollaires and Propositions already get Tailwind Typography's
@@ -125,7 +141,16 @@ function blockquoteStatement(content, chunkType) {
   if (!HIGHLIGHTED_TYPES.has(chunkType)) return content;
   if (/^\s*>/.test(content)) return content; // already quoted by the source
 
-  const cutoffPatterns = [/Principe de démonstration/i, /Démonstration(?!s)[.\s]/i, /---\s*Solution\s*\(/i];
+  // \*{0,2} before each word, not just at the match itself — the source
+  // often bolds the word ("**Démonstration.**"); without consuming the
+  // opening ** into the cutoff, it's left dangling at the end of the quoted
+  // statement while the closing ** ends up orphaned at the start of `rest`,
+  // rendering as literal stray asterisks instead of actual bold text.
+  const cutoffPatterns = [
+    /\*{0,2}Principe de démonstration/i,
+    /\*{0,2}Démonstration(?!s)[.\s]/i,
+    /---\s*Solution\s*\(/i,
+  ];
   const cutoffIndex = cutoffPatterns
     .map((re) => content.search(re))
     .filter((i) => i !== -1)

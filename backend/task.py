@@ -148,12 +148,31 @@ def clean_markdown(md_text: str) -> str:
 # found first, as intended.
 # ---------------------------------------------------------------------------
 HEADING_PATTERN = re.compile(
-    r"^(?:p\.\d+\s+)?"
+    r"^[ \t]*"
+    # A page reference can also arrive as "<mark>p.820</mark>" instead of a
+    # bare "p.820 " prefix — clean_markdown strips the <mark> tag (and its
+    # content) entirely, but leaves behind the single space that sat between
+    # the tag and the heading, e.g. " **Exercice 11**". That one leading
+    # space alone defeats the line-start anchor below, same failure mode as
+    # the original unwrapped "p.NNN" prefix bug, just one layer removed —
+    # confirmed via a real case where this silently merged a whole exercise
+    # statement into the preceding Proposition's content instead of giving
+    # it its own chunk. The leading [ \t]* here absorbs that residue
+    # regardless of which wrapper produced it.
+    r"(?:p\.\d+\s+)?"
     r"(?:#{1,3}\s*)?"
     r"\*{0,2}"
     r"(Définition|Théorème|Proposition|Exercice|Corollaire|Lemme|"
     r"Remarques?|Exemples?|Point méthode)"
     r"(?:[ \t]+(\d+(?:\.\d+)?))?"
+    # A parenthetical subtitle right after the number ("Corollaire 10
+    # (Inégalité de Bessel)") is otherwise left stranded as this heading's
+    # own "body" — which matters when the source also has a duplicate
+    # back-to-back heading for the same (type, number) with no real content
+    # between them (confirmed in a real chapter): the stranded subtitle text
+    # makes that first occurrence look non-empty, defeating the
+    # duplicate-heading detection in chunk_by_structure.
+    r"(?:\s*\([^)]*\))?"
     r"\*{0,2}",
     re.MULTILINE,
 )
@@ -460,17 +479,36 @@ def chunk_by_structure(
         body_after_heading = markdown_text[heading_end:end].strip()
 
         key = (chunk_type, number) if number is not None else (chunk_type, None, i)
+        statement = split_statement_from_block(body_after_heading, chunk_type, tokenizer)
 
         if number is not None and key in units_by_key:
             existing = units_by_key[key]
+            if not existing["child_content"].strip():
+                # The earlier occurrence of this (chunk_type, number) was a
+                # bare duplicate heading with nothing before the next heading
+                # immediately followed it — a source PDF-extraction artifact
+                # ("### **Corollaire 9**" directly followed by "## **Corollaire
+                # 9**" with nothing between them, confirmed in a real chapter)
+                # rather than a genuine statement. Replace it with this
+                # occurrence's real content instead of appending it as a
+                # "--- Solution ---" block, which would otherwise misfile the
+                # actual statement as if it were a solution merge.
+                units_by_key[key] = {
+                    "chunk_type": chunk_type,
+                    "number": number,
+                    "parent_content": block,
+                    "parent_tokens": len(tokenizer.encode(block)),
+                    "child_content": statement,
+                    "child_tokens": len(tokenizer.encode(statement)),
+                    "part_index": section_index_for_position(start, section_starts),
+                }
+                continue
             existing["parent_content"] = (
                 f"{existing['parent_content']}\n\n"
                 f"--- Solution ({chunk_type} {number}) ---\n\n{block}"
             )
             existing["parent_tokens"] = len(tokenizer.encode(existing["parent_content"]))
             continue
-
-        statement = split_statement_from_block(body_after_heading, chunk_type, tokenizer)
 
         unit = {
             "chunk_type": chunk_type,

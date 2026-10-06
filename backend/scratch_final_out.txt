@@ -1,0 +1,8 @@
+total parent chunks: 100, duplicate content rows: 0
+
+=== Corollaire 9 ===
+"## **Corollaire 9**\n\nSoit $\\mathcal{B} = (e_1, e_2, \\dots, e_p)$ une base orthonormale d'un sous-espace vectoriel $F$ de $E$. On a l'égalité :\n\n$$d^2(*x, F*) = \\|x\\|^2 - \\sum_{i=1}^{p} (e_i \\mid x)^2.$$\n\n\nDémonstration page 816\n\n--- Solution (Corollaire 9) ---\n\n**Corollaire 9** Par projection orthogonale sur le sous-espace $F$ engendré par $(e_1, \\dots, e_p)$, on a :\n$$x = p_F(x) + g = \\sum_{i=1}^p (e_i \\mid x) e_i + g \\quad \\text{avec} \\quad g \\in F^\\perp.$$\nL'égalité de Pythagore fournit :\n$$\\|x\\|^2 = \\sum_{i=1}^p (e_i \\mid x)^2 + \\|g\\|^2.$$"
+
+=== Corollaire 10 ===
+'# **Corollaire 10 (Inégalité de Bessel)**\n\nSi $(e_1, \\dots, e_p)$ est une famille orthonormée de $E$, on a, pour tout $x \\in E$ :\n\n$$\\sum_{i=1}^{p} (e_i \\mid x)^2 \\leqslant \\|x\\|^2.$$'
+
