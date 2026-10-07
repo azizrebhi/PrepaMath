@@ -66,6 +66,15 @@ app.include_router(fastapi_users.get_oauth_router(
     # localhost.
     redirect_url=os.getenv("GOOGLE_OAUTH_REDIRECT_URL", "http://localhost:5173/auth/google/callback"),
     associate_by_email=True,
+    # fastapi-users' CSRF cookie defaults to SameSite=Lax, which only
+    # survives top-level navigations — but this flow calls /authorize and
+    # /callback via fetch() from a different origin (Vercel frontend calling
+    # the Render backend), not a page redirect. A Lax cookie set on one
+    # cross-origin fetch silently never comes back on the next one, which
+    # surfaces as an opaque "invalid state token" failure at /callback.
+    # SameSite=None (paired with the already-default Secure=True) is what
+    # cross-site fetch-based cookies actually require.
+    csrf_token_cookie_samesite="none",
           ),
           prefix="/auth/google",
           tags=["auth"],
