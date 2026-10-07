@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -20,6 +21,20 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
+
+# alembic.ini's sqlalchemy.url is a local-dev-only placeholder
+# (postgresql+psycopg2://prepamath:prepamath@localhost:5432/prepamath) — it
+# only ever worked because a real local Postgres happened to be listening
+# there with those exact credentials. Override it with the real postgres_url
+# env var (the same one app/database.py reads) whenever it's set, so
+# migrations target whatever database is actually configured instead of
+# always connecting to localhost regardless of environment. Alembic runs
+# synchronously here, so the +asyncpg driver from postgres_url (meant for
+# the app's async engine) is swapped for +psycopg2, already a dependency
+# for exactly this purpose.
+database_url = os.getenv("postgres_url")
+if database_url:
+    config.set_main_option("sqlalchemy.url", database_url.replace("+asyncpg", "+psycopg2"))
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
