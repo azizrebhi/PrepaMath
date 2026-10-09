@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import AppShell from "./components/layout/AppShell";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import WelcomePage from "./pages/WelcomePage";
 import RoadmapPage from "./pages/RoadmapPage";
 import ChapterWorkspacePage from "./pages/ChapterWorkspacePage";
@@ -13,9 +14,30 @@ export default function App() {
     <Routes>
       <Route element={<AppShell />}>
         <Route path="/" element={<WelcomePage />} />
-        <Route path="/chapters" element={<RoadmapPage />} />
-        <Route path="/chapters/:subject" element={<SubjectGraphPage />} />
-        <Route path="/chapter/:chapterId" element={<ChapterWorkspacePage />} />
+        <Route
+          path="/chapters"
+          element={
+            <ProtectedRoute>
+              <RoadmapPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chapters/:subject"
+          element={
+            <ProtectedRoute>
+              <SubjectGraphPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chapter/:chapterId"
+          element={
+            <ProtectedRoute>
+              <ChapterWorkspacePage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />

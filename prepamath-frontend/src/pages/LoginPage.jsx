@@ -13,6 +13,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const sessionExpired = location.state?.sessionExpired;
+  const redirectTo = location.state?.from?.pathname ?? "/chapters";
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -32,7 +33,7 @@ export default function LoginPage() {
       if (!res.ok) throw new Error("Email ou mot de passe incorrect.");
       const data = await res.json();
       login(data.access_token);
-      navigate("/chapters");
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {

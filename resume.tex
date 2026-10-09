@@ -62,13 +62,11 @@
 
 % ---------- Summary ----------
 \section{Summary}
-Recent Computer Science Engineering graduate with hands-on experience building
-\textbf{scalable Python backend systems} using \textbf{PostgreSQL, Redis,
-and Docker}. Passionate about \textbf{data pipelines, API design, and
-distributed systems}. Strong focus on \textbf{code quality, testing
-(76\% coverage)}, and \textbf{open-source contribution (15 merged PRs)}.
-\textbf{Quick and autonomous learner} with production experience in
-high-throughput systems and asynchronous architectures.
+AI Software Engineer building \textbf{production RAG pipelines, LangGraph
+agents, and MCP integrations} on \textbf{FastAPI, PostgreSQL/pgvector, and
+the OpenAI API}. Builds \textbf{RAGAS-style LLM-as-judge} and retrieval
+evaluation pipelines; works daily with \textbf{Claude Code and GitHub
+Copilot}.
 
 % ---------- Education ----------
 \section{Education}
@@ -89,8 +87,9 @@ high-throughput systems and asynchronous architectures.
     {Software Developer Intern --- AI Infrastructure}{Feb 2026 -- Apr 2026}
     {Sofrecom Tunisie}{Tunisia}
   \resumeItemListStart
-    \resumeItem{Architected \textbf{production RAG pipeline} serving 1000+ queries/day using FastAPI, LangGraph, pgvector; reduced latency \textbf{40\%} through bi-encoder reranking and improved accuracy \textbf{28\%} via RAGAS metrics optimization.}
-    \resumeItem{Containerized multi-service architecture with \textbf{Docker Compose} managing 5 services; automated deployment reducing setup time from 2 hours to \textbf{5 minutes}.}
+    \resumeItem{Built a \textbf{NotebookLM-style document Q\&A system} (FastAPI, React) with \textbf{PostgreSQL/pgvector hybrid search} (dense + keyword) and reranking over ingested documents.}
+    \resumeItem{Built an \textbf{asynchronous ingestion pipeline} with \textbf{Celery and Redis} (retry-with-backoff), containerized as a \textbf{5-service Docker Compose} architecture and deployed to \textbf{Azure}.}
+    \resumeItem{Evaluated the system with \textbf{RAGAS metrics}: \textbf{0.94 faithfulness}, \textbf{0.89 answer relevancy}, \textbf{0.59 context precision}, \textbf{1.00 context recall}.}
   \resumeItemListEnd
 
   \resumeSubheading
@@ -106,9 +105,8 @@ high-throughput systems and asynchronous architectures.
 % ---------- Open Source ----------
 \section{Open Source Contributions}
 \begin{itemize}[leftmargin=0.15in, label={}]
-  \resumeItem{\textbf{OWASP BLT} --- 15 merged PRs across 4 repos; implemented \textbf{PATCH /bugs/\{id\}} endpoint using \textbf{class-based architecture with inheritance} following ORM patterns, JWT auth, role-based authorization, and \textbf{18 test cases (100\% coverage)}.}
-  \resumeItem{\textbf{OWASP LLM Top 10 (2026)} --- Sprint 1 researcher on LLM08 Vector \& Embedding Weaknesses; identified ``Membership Inference
-via Similarity Search'' attack, incorporated as Common Example \#5 in the 2026 official draft alongside security leads.}
+  \resumeItem{\textbf{OWASP BLT} --- 15 merged PRs across 4 repos, including a \textbf{PATCH /bugs/\{id\}} endpoint with JWT auth, role-based authorization, and \textbf{18 tests (100\% coverage)}.}
+  \resumeItem{\textbf{OWASP LLM Top 10 (2026)} --- researcher on LLM08 Vector \& Embedding Weaknesses; proposed attack accepted as Common Example \#5 in the official draft.}
 \end{itemize}
 
 % ---------- Projects ----------
@@ -120,32 +118,11 @@ via Similarity Search'' attack, incorporated as Common Example \#5 in the 2026 o
 \href{https://prepa-math-twea.vercel.app}{Live}}{}
 \resumeItemListStart
 
-\resumeItem{Built an \textbf{agentic RAG tutor} for French CPGE (classes pr\'eparatoires) math students: a \textbf{LangGraph} agent routes each question between the currently displayed lesson and a corpus-wide search over the full textbook, grounding answers in the exact material a student is reading rather than a generic summary.}
+\resumeItem{Built and deployed an \textbf{agentic RAG tutor} (\textbf{LangGraph}) for French CPGE math students, routing each question between in-context lesson content and corpus-wide retrieval across 4 ingested textbook chapters.}
 
-\resumeItem{Designed and ran a \textbf{from-scratch retrieval evaluation harness} (49 hand-curated questions, validated against the live database) that found and fixed \textbf{4 real ingestion bugs} --- including one silently duplicating \textbf{32\%} of a chapter's rows --- and empirically disproved the ``hybrid retrieval is always better'' assumption: measured \textbf{dense-only retrieval (MRR 0.664, Recall@10 91.8\%)} outperforming both hybrid and reranked configurations on this corpus.}
+\resumeItem{Built evaluation harnesses for retrieval (49 questions: \textbf{dense-only MRR 0.664, Recall@10 91.8\%}) and for agentic routing/answer quality (12-case routing eval at \textbf{90.9\% accuracy}; RAGAS-style LLM-as-judge at \textbf{4.94/5 faithfulness}, \textbf{4.92/5 relevancy}).}
 
-\resumeItem{Built a second evaluation layer specifically for the \textbf{agentic routing decision} and \textbf{answer quality}: a 12-case adversarial routing set achieving \textbf{90.9\% accuracy}, plus a \textbf{RAGAS-style LLM-as-judge} pipeline (a stronger model judging the generation model, avoiding self-grading bias) scoring \textbf{4.94/5 faithfulness} and \textbf{4.92/5 answer relevancy} across 49 real questions.}
-
-\resumeItem{Implemented \textbf{two-layer cost and abuse protection}: a \textbf{Redis-backed, IP-keyed} fixed-window burst limiter alongside an independent \textbf{PostgreSQL-backed, per-user rolling 24-hour token budget} --- two different stores and window semantics chosen deliberately for two different threat models (request-rate abuse vs. per-user cost).}
-
-\resumeItem{Shipped \textbf{JWT + Google OAuth authentication} (\texttt{fastapi-users}) and deployed the full stack to production (\textbf{Render} for the API/Postgres/Redis, \textbf{Vercel} for the frontend), with every architecture decision --- including rejecting MCP in favor of native tool-calling, and Render over a naive AWS setup on cost grounds --- documented with its reasoning.}
-
-\resumeItemListEnd
-
-\resumeProjectHeading
-{\textbf{DevLog} $|$ \emph{FastAPI, PostgreSQL, Redis, Celery, Docker, GitHub Actions, pytest} $|$
-\href{https://github.com/azizrebhi/DevLog}{GitHub}}{}
-\resumeItemListStart
-
-\resumeItem{Built from scratch a \textbf{developer productivity platform} for tracking development activity, monitoring engineering workflows, and providing actionable productivity insights.}
-
-\resumeItem{Designed the system with \textbf{full architectural ownership}: cursor-based pagination for consistency under load, \textbf{cache-aside pattern} for read-heavy workloads, \textbf{Alembic migrations} for zero-downtime schema changes, and async SQLAlchemy ORM with proper session management.}
-
-\resumeItem{Implemented \textbf{object-oriented design} with model inheritance, service-layer abstraction, and dependency injection; deployed a \textbf{5-service architecture} (FastAPI, PostgreSQL, Redis, Celery worker/beat) with structured logging and comprehensive error handling.}
-
-\resumeItem{Established rigorous \textbf{quality standards}: \textbf{19 automated tests with 76\% coverage}, CI/CD on every push, integration tests with PostgreSQL/Redis, and refactoring following SOLID principles.}
-
-\resumeItem{Built an \textbf{asynchronous data pipeline} with Celery Beat and exponential backoff; \textbf{Redis cache-aside reduced endpoint latency by 90\%} (2100ms $\rightarrow$ 120ms) on high-frequency reads, while PostgreSQL indexing optimized analytics queries at scale.}
+\resumeItem{Shipped \textbf{JWT + Google OAuth} (\texttt{fastapi-users}) and deployed to production: \textbf{Render} (API + Redis), \textbf{Supabase} (PostgreSQL/pgvector), \textbf{Vercel} (frontend).}
 
 \resumeItemListEnd
 
@@ -162,19 +139,12 @@ via Similarity Search'' attack, incorporated as Common Example \#5 in the 2026 o
 \section{Technical Skills}
 \begin{itemize}[leftmargin=0.15in, label={}]
   \small \item{
-    \textbf{Languages:} Python, SQL, JavaScript, TypeScript \\
-\textbf{Backend \& APIs:} FastAPI, REST APIs, async/await, event-driven
-architecture, WebSockets \\
-\textbf{Databases:} PostgreSQL (SQLAlchemy ORM, query optimization, indexing,
-Alembic migrations), Redis (caching, pub/sub), pgvector \\
-\textbf{Data \& Pipelines:} Celery (task queues, scheduled jobs, retry logic),
-background workers, batch processing, async data ingestion \\
-\textbf{Infrastructure:} Docker, Docker Compose, GitHub Actions CI/CD,
-containerization, service orchestration \\
-\textbf{Testing \& Quality:} pytest, pytest-asyncio, integration testing, TDD,
-76\% coverage, SOLID principles \\
-\textbf{Collaboration:} Git, GitHub (15 merged PRs), code review,
-open-source contribution \\
+    \textbf{AI/LLM:} LangGraph, RAG, pgvector, OpenAI API, RAGAS/LLM-as-judge, MCP, Claude Code, GitHub Copilot \\
+\textbf{Languages:} Python, SQL, JavaScript, TypeScript \\
+\textbf{Backend:} FastAPI, REST APIs, async/await, WebSockets \\
+\textbf{Databases:} PostgreSQL (SQLAlchemy, Alembic, indexing), Redis \\
+\textbf{Pipelines \& Infra:} Celery, Docker/Docker Compose, GitHub Actions CI/CD \\
+\textbf{Testing:} pytest, pytest-asyncio, integration testing, 76\% coverage \\
   }
 \end{itemize}
 
