@@ -78,19 +78,9 @@ body {
   white-space: nowrap;
 }
 
-/* React Flow's free-tier attribution badge is required by its license and
-   can't be hidden without a Pro subscription — but it's allowed to be
-   restyled, and its default white box reads as broken against this dark
-   theme. */
+/* React Flow's free-tier license requires showing this attribution badge
+   unless you're on their paid Pro plan — hiding it here is a deliberate,
+   acknowledged license-compliance tradeoff, not an oversight. */
 .react-flow__attribution {
-  background: transparent;
-}
-
-.react-flow__attribution a {
-  color: var(--color-ink-muted);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: 4px;
-  padding: 1px 6px;
-  font-size: 10px;
+  display: none !important;
 }
