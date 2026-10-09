@@ -33,6 +33,11 @@ export default function LoginPage() {
       if (!res.ok) throw new Error("Email ou mot de passe incorrect.");
       const data = await res.json();
       login(data.access_token);
+      try {
+        sessionStorage.removeItem("post_login_redirect");
+      } catch {
+        // Private browsing / blocked storage — nothing to clean up.
+      }
       navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.message);

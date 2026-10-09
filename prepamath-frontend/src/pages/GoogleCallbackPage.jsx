@@ -23,7 +23,15 @@ export default function GoogleCallbackPage() {
         if (!res.ok) throw new Error("Échec de la connexion Google.");
         const data = await res.json();
         login(data.access_token);
-        navigate("/chapters");
+
+        let redirectTo = "/chapters";
+        try {
+          redirectTo = sessionStorage.getItem("post_login_redirect") ?? "/chapters";
+          sessionStorage.removeItem("post_login_redirect");
+        } catch {
+          // Private browsing / blocked storage — falls back to /chapters.
+        }
+        navigate(redirectTo, { replace: true });
       } catch (err) {
         setError(err.message);
       }

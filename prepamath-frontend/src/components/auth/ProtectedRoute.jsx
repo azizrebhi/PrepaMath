@@ -9,6 +9,15 @@ export default function ProtectedRoute({ children }) {
   const location = useLocation();
 
   if (!isAuthenticated) {
+    // Google OAuth leaves the page entirely (window.location.href to
+    // google.com and back), which wipes router state — sessionStorage
+    // survives that round trip, so GoogleCallbackPage can still read the
+    // intended destination back out after the redirect returns.
+    try {
+      sessionStorage.setItem("post_login_redirect", location.pathname);
+    } catch {
+      // Private browsing / blocked storage — falls back to /chapters.
+    }
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
